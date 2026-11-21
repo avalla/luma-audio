@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Acido — bassline acida</title>
+<link rel="stylesheet" href="acido.css">
+</head>
+<body>
+<main class="unit">
+ <header class="top">
+  <h1 class="brand">ACIDO<span>bassline monofonica</span></h1>
+  <div class="transport">
+   <button id="play" class="play" type="button" aria-pressed="false"><span class="play-icon" aria-hidden="true"></span><span class="play-label">Play</span></button>
+   <label class="field tempo">Tempo<input id="tempo" type="number" min="60" max="200" step="1" inputmode="numeric"><span>BPM</span></label>
+   <label class="field">Swing<input id="swing" type="number" min="50" max="75" step="1" inputmode="numeric"><span>%</span></label>
+   <label class="field">Preset<select id="preset"></select></label>
+   <button type="button" id="my-presets" class="plain">I miei preset</button>
+   <label class="field">Lingua<select id="language"><option value="it">Italiano</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option></select></label>
+  </div>
+ </header>
+
+ <section class="panel" aria-label="Suono">
+  <div class="knobs" id="knobs"></div>
+  <div class="switches">
+   <div class="wave" role="radiogroup" aria-label="Forma d'onda">
+    <span class="wave-title">Wave</span>
+    <button type="button" role="radio" data-param="waveform" data-value="0" aria-checked="true"><svg viewBox="0 0 24 12" aria-hidden="true"><path d="M1 11 L11 1 L11 11 L21 1 L21 11"/></svg>Saw</button>
+    <button type="button" role="radio" data-param="waveform" data-value="1" aria-checked="false"><svg viewBox="0 0 24 12" aria-hidden="true"><path d="M1 11 V1 H8 V11 H15 V1 H22 V11"/></svg>Square</button>
+   </div>
+   <div class="wave" role="radiogroup" aria-label="Carattere della distorsione">
+    <span class="wave-title">Dist</span>
+    <button type="button" role="radio" data-param="distType" data-value="0" aria-checked="true"><svg viewBox="0 0 24 12" aria-hidden="true"><path d="M1 9 C5 9 7 2 12 2 S19 3 23 3"/></svg>Overdrive</button>
+    <button type="button" role="radio" data-param="distType" data-value="0.5" aria-checked="false"><svg viewBox="0 0 24 12" aria-hidden="true"><path d="M1 11 L6 2 H18 L23 11"/></svg>Pedale</button>
+    <button type="button" role="radio" data-param="distType" data-value="1" aria-checked="false"><svg viewBox="0 0 24 12" aria-hidden="true"><path d="M1 11 L3 2 H9 L11 11 L13 2 H19 L21 11"/></svg>Fuzz</button>
+   </div>
+   <div class="wave">
+    <span class="wave-title">Glitch</span>
+    <button type="button" id="stutter" class="stutter" aria-pressed="false" aria-describedby="stutter-help"><svg viewBox="0 0 24 12" aria-hidden="true"><path d="M1 11 V3 H5 V11 M8 11 V3 H12 V11 M15 11 V3 H19 V11"/></svg>Stutter</button>
+    <span class="hint" id="stutter-help">tieni premuto, o <kbd>Q</kbd></span>
+   </div>
+  </div>
+ </section>
+
+ <section class="seq" aria-label="Sequencer">
+  <div class="seq-bank">
+   <div class="banks" id="banks" role="group" aria-label="Banco"></div>
+   <div class="patterns" id="patterns" role="group" aria-label="Pattern (tasti 1-8)"></div>
+   <button type="button" id="copy">Copia</button>
+   <button type="button" id="paste" disabled>Incolla</button>
+   <label class="field chain">Catena<input id="chain" type="text" placeholder="es. A A B A" autocomplete="off" spellcheck="false" aria-describedby="chain-help"></label>
+   <span class="hint" id="chain-help">Vuota = ripete il pattern scelto</span>
+  </div>
+  <div class="seq-tools">
+   <div class="part" role="radiogroup" aria-label="Modifica"><span class="wave-title">Modifica</span><button type="button" role="radio" data-part="lead" aria-checked="true">Lead</button><button type="button" role="radio" data-part="bass" aria-checked="false">Basso</button></div>
+   <button type="button" id="random">Casuale</button>
+   <button type="button" id="clear">Svuota</button>
+   <button type="button" id="undo" disabled>Annulla</button>
+   <button type="button" id="redo" disabled>Ripristina</button>
+   <button type="button" id="left" aria-label="Sposta pattern a sinistra">◀</button>
+   <button type="button" id="right" aria-label="Sposta pattern a destra">▶</button>
+   <label class="field">Passi<input id="length" type="number" min="1" max="16" step="1" inputmode="numeric"></label>
+  </div>
+  <div class="seq-tools">
+   <button type="button" id="rec" class="rec" aria-pressed="false">Rec</button>
+   <label class="field">Automazione<select id="lane"><option value="cutoff">Cutoff</option><option value="resonance">Reso</option><option value="envMod">Env Mod</option><option value="decay">Decay</option></select></label>
+   <button type="button" id="clear-auto">Cancella</button>
+   <button type="button" id="kick-reset">Kick 4/4</button>
+   <button type="button" id="import">Importa MIDI</button>
+   <input id="midi-file" type="file" accept=".mid,.midi,audio/midi" hidden>
+   <button type="button" id="export">Esporta WAV</button>
+   <label class="field">Giri<input id="loops" type="number" min="1" max="16" step="1" value="4" inputmode="numeric"></label>
+   <button type="button" id="share">Condividi</button>
+   <span class="status" id="status" aria-live="polite"></span>
+  </div>
+  <div class="roll-wrap">
+   <div class="roll" id="roll" role="group" aria-label="Note del pattern"></div>
+  </div>
+ </section>
+
+ <section class="song" aria-label="Brano">
+  <div class="song-head">
+   <h2>Brano</h2>
+   <label class="check"><input id="song-on" type="checkbox"><span>Attivo</span></label>
+   <button type="button" id="song-add">Aggiungi sezione</button>
+  </div>
+  <p class="hint" id="song-empty">Aggiungi una sezione per costruire intro, break e drop: scegli i pattern, le ripetizioni e le parti da silenziare.</p>
+  <div id="song-list"></div>
+ </section>
+
+ <footer class="help">
+  <p><kbd>A W S E D F T G Y H U J K</kbd> suonano un'ottava; legato = slide, <kbd>Shift</kbd> = accent, <kbd>Z</kbd>/<kbd>X</kbd> ottava. Con il sequencer in play i tasti traspongono il pattern. <kbd>1</kbd>–<kbd>8</kbd> scelgono il pattern (in play parte a fine giro). <kbd>Q</kbd> tenuto = stutter. <kbd>Spazio</kbd> play/stop, <kbd>Esc</kbd> silenzio. Sui pomelli: trascina in verticale, frecce, doppio clic per il valore iniziale.</p>
+  <p>Con Rec attivo, in play, i movimenti di Cutoff, Reso, Env Mod e Decay entrano nel pattern. Nella riga Auto puoi disegnarli; doppio clic cancella un passo. Riga Voc: vocale del filtro a formanti per ogni passo. Cmd/Ctrl+Z annulla, Shift+Cmd/Ctrl+Z ripristina.</p>
+ </footer>
+</main>
+<dialog id="midi-dialog" aria-labelledby="midi-title">
+ <h2 id="midi-title">Importa MIDI</h2>
+ <p class="file-name" id="mid-name"></p>
+ <p class="hint" id="mid-info"></p>
+ <div class="dialog-grid">
+  <label class="field">Traccia<select id="mid-track"></select></label>
+  <label class="field">Da battuta<input id="mid-start" type="number" min="1" step="1" inputmode="numeric"></label>
+  <label class="field">Battute<input id="mid-bars" type="number" min="1" step="1" inputmode="numeric"></label>
+  <label class="field">Divisione basso<input id="mid-split" type="number" min="24" max="108" step="1" inputmode="numeric"></label>
+  <label class="check"><input id="mid-double" type="checkbox"><span>Doppio tempo</span></label>
+ </div>
+ <p class="hint">Sostituisce i pattern attuali. Puoi tornare indietro con Annulla.</p>
+ <p class="preview" id="mid-preview" role="status"></p>
+ <div class="dialog-actions"><button type="button" id="mid-cancel">Chiudi</button><button type="button" id="mid-go" class="primary">Importa</button></div>
+</dialog>
+<dialog id="presets-dialog" aria-labelledby="presets-title">
+ <h2 id="presets-title">I miei preset</h2>
+ <div class="preset-save"><input id="preset-name" type="text" maxlength="40" placeholder="Nome preset" aria-label="Nome preset"><button type="button" id="preset-save" class="primary">Salva</button></div>
+ <p class="hint" id="preset-empty">Nessun preset salvato</p>
+ <ul id="preset-list"></ul>
+ <div class="dialog-actions"><button type="button" id="presets-close">Chiudi</button></div>
+</dialog>
+<script src="session.js"></script>
+<script src="i18n.js"></script>
+<script src="tools.js"></script>
+<script src="midi.js"></script>
+<script src="demos.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
