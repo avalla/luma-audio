@@ -32,7 +32,7 @@ int main(){
             for(int c=0;c<channels;++c)for(int i=0;i<room.getNumSamples();++i)check(std::isfinite(room.getSample(c,i))&&std::abs(room.getSample(c,i))<=1,"Invalid effect output");
         }
         orbit::Effects bypass;bypass.prepare(48000);AudioBuffer<float> dry(1,32);for(int i=0;i<32;++i)dry.setSample(0,i,float(i)/64);bypass.process(dry,120,0,0,.35f,0,.5f);for(int i=0;i<32;++i)check(dry.getSample(0,i)==float(i)/64,"Default effects altered dry signal");
-        for(double rate:{44100.0,48000.0,96000.0})for(int sound=0;sound<5;++sound){
+        for(double rate:{44100.0,48000.0,96000.0})for(int sound=0;sound<8;++sound){
             orbit::Engine e;orbit::Settings settings;settings.sound=sound;settings.bpm=120;settings.explore=1;settings.locks[0]=true;e.configure(settings);e.prepare(rate);
             double energy=0;
             for(int i=0;i<int(rate*5);++i){const float x=e.sample();check(std::isfinite(x)&&std::abs(x)<1,"Nonfinite or clipped DSP");energy+=x*x;}

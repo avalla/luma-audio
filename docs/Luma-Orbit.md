@@ -154,3 +154,7 @@ La pipeline della [release 0.4.0](https://github.com/avalla/luma-orbit/actions/r
 ha completato build universale, test, scambio preset e verifica del pacchetto.
 Le verifiche locali includono anche gli altri due plugin e l'esecuzione Orbit x86_64
 tramite Rosetta; non equivalgono a una prova su un Mac Intel fisico o su tutte le DAW.
+
+## Nuovi timbri
+
+Orbit offre otto caratteri: Glass, Rubber, Mist, Soft Keys, Bell, Organ, Velvet e Prism. Organ somma le prime tre armoniche con una coda sostenuta; Velvet usa un attacco di 120 ms e armoniche calde; Prism aggiunge seconda e quarta armonica per una trama brillante. La selezione cambia il timbro, lasciando la composizione e il mixer sotto il tuo controllo. Corpo, luminosità ed effetti restano combinabili con ogni suono. I preset salvano anche i nuovi timbri; per riaprirli serve una versione aggiornata di Orbit.

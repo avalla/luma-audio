@@ -19,7 +19,7 @@ inline juce::var toJson(const Snapshot& snapshot){
     for(int i=0;i<s.patternLength;++i){auto e=object();const auto event=s.customPattern?s.pattern[size_t(i)]:Event{i%8,1,false};put(e,"index",event.index);put(e,"beats",event.beats);put(e,"rest",event.rest);phrase.add(e);}
     for(int i=0;i<16;++i){auto h=object();const auto hit=s.customDrums?s.percussion[size_t(i)]:std::array<bool,3>{{i==0||i==8,i==4||i==12,i%2==0}};put(h,"kick",hit[0]);put(h,"clap",hit[1]);put(h,"hat",hit[2]);put(h,"velocity",s.customDrums?double(s.percussionVelocity[size_t(i)]):1.0);drums.add(h);}
     put(p,"base",notes);put(p,"notes",notes);put(p,"locks",locks);put(p,"phrase",phrase);put(p,"drumPattern",drums);
-    const char* sounds[]={"glass","rubber","mist","keys","bell"};const char* scales[]={"minor","major","pentatonic"};
+    const char* sounds[]={"glass","rubber","mist","keys","bell","organ","velvet","prism"};const char* scales[]={"minor","major","pentatonic"};
     put(p,"sound",sounds[s.sound]);put(p,"scale",scales[s.scale]);put(p,"flow",s.flow);put(p,"drumsEnabled",s.drums);
     put(enabled,"kick",s.kick);put(enabled,"clap",s.clap);put(enabled,"hat",s.hat);put(p,"drumEnabled",enabled);
     auto percent=[&](const char* id,float value){put(c,id,std::round(double(value)*10000)/100);};
@@ -37,7 +37,7 @@ inline bool fromJson(const juce::var& p,Snapshot& result){
     auto integer=[&](const var& v,int min,int max){return number(v,min,max)&&double(v)==std::floor(double(v));};
     for(const char* key:{"base","notes","locks"})if(!p[key].isArray()||p[key].size()!=8)return false;
     for(int i=0;i<8;++i){if(!integer(p["notes"][i],0,7)||!integer(p["base"][i],0,7)||!p["locks"][i].isBool())return false;s.notes[size_t(i)]=int(p["notes"][i]);s.locks[size_t(i)]=bool(p["locks"][i]);}
-    StringArray sounds{"glass","rubber","mist","keys","bell"},scales{"minor","major","pentatonic"};s.sound=sounds.indexOf(p["sound"].toString());s.scale=scales.indexOf(p["scale"].toString());if(s.sound<0||s.scale<0)return false;
+    StringArray sounds{"glass","rubber","mist","keys","bell","organ","velvet","prism"},scales{"minor","major","pentatonic"};s.sound=sounds.indexOf(p["sound"].toString());s.scale=scales.indexOf(p["scale"].toString());if(s.sound<0||s.scale<0)return false;
     if(!p["flow"].isBool()||!p["drumsEnabled"].isBool())return false;s.flow=bool(p["flow"]);s.drums=bool(p["drumsEnabled"]);
     const auto enabled=p["drumEnabled"];for(const char* k:{"kick","clap","hat"})if(!enabled[k].isBool())return false;s.kick=bool(enabled["kick"]);s.clap=bool(enabled["clap"]);s.hat=bool(enabled["hat"]);
     const auto c=p["controls"];bool valid=true;auto percent=[&](const char* id,float& dest,double max=100){if(!number(c[id],0,max)){valid=false;return;}dest=float(double(c[id])/100);};

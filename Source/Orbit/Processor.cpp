@@ -11,7 +11,7 @@ AudioProcessorValueTreeState::ParameterLayout layout(){
     const float defaults[]={.35f,.62f,.35f,.45f,.65f,.55f,.3f};
     for(int i=0;i<7;++i)p.add(std::make_unique<AudioParameterFloat>(ParameterID{ids[4+i],1},names[i],NormalisableRange<float>(0,1,.01f),defaults[i]));
     p.add(std::make_unique<AudioParameterChoice>(ParameterID{"scale",1},"Scale",StringArray{"La minore","Do maggiore","La pentatonica"},0));
-    p.add(std::make_unique<AudioParameterChoice>(ParameterID{"sound",1},"Sound",StringArray{"Glass","Rubber","Mist","Soft Keys","Bell"},0));
+    p.add(std::make_unique<AudioParameterChoice>(ParameterID{"sound",1},"Sound",StringArray{"Glass","Rubber","Mist","Soft Keys","Bell","Organ","Velvet","Prism"},0));
     p.add(std::make_unique<AudioParameterChoice>(ParameterID{"accents",1},"Accents",StringArray{"5 accenti","7 accenti","8 accenti"},0));
     boolean("drums","Drums",true);boolean("kick","Kick",true);boolean("clap","Clap",true);boolean("hat","Hi-hat",true);
     const char* fxIds[]={"delayMix","delayFeedback","roomMix","roomSize"};

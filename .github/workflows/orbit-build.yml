@@ -49,6 +49,8 @@ jobs:
           python3 scripts/generate_orbit_locales.py --check
           node prototypes/orbit/i18n.test.cjs
           node prototypes/orbit/flow.test.cjs
+          node prototypes/orbit/sampler.test.cjs
+          node prototypes/orbit/broken.test.cjs
           node prototypes/orbit/clock.test.cjs
           node prototypes/orbit/session.test.cjs
 

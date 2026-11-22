@@ -123,3 +123,17 @@ Direzione visiva sviluppata con la skill Impeccable: essenziale e precisa, speri
 Verifica eseguita in Chromium: avvio/stop del contesto audio e delle voci, blocco delle note durante le variazioni, cattura e annullamento; nessun overflow orizzontale a 1360, 850 e 390 px. La verifica soggettiva dell’audio e la validazione su iPhone fisico restano distinte dai test automatici.
 
 Verifica clock: oltre 500 attacchi con polling irregolare, cambio tempo, recupero da stallo, stop e riavvio. In Chromium verificati attacchi futuri senza deriva con blocchi JS di 35 ms, cambio BPM, cursore, cancellazione delle voci future e stop senza eventi UI residui.
+
+## Nuovi timbri
+
+Orbit offre otto caratteri: Glass, Rubber, Mist, Soft Keys, Bell, Organ, Velvet e Prism. Organ somma le prime tre armoniche con una coda sostenuta; Velvet usa un attacco di 120 ms e armoniche calde; Prism aggiunge seconda e quarta armonica per una trama brillante. La selezione cambia il timbro, lasciando la composizione e il mixer sotto il tuo controllo. Corpo, luminosità ed effetti restano combinabili con ogni suono. I preset salvano anche i nuovi timbri; per riaprirli serve una versione aggiornata di Orbit.
+
+## Broken (web)
+
+Frammentazione a 0% conserva il groove. Prova 40–70% con Rubber o Prism: introduce pause, accorcia le note e genera raddoppi o terzine dentro ogni ottavo, rispettando Swing e BPM. Agisce sul synth e sul sub; la batteria mantiene il suo pattern. Si salva nei preset e nelle scene web. MIDI esporta la frase di base, mentre WAV registra i rimbalzi effettivamente suonati. Il plugin nativo non applica ancora Broken: un passaggio nel nativo perde questo controllo. Non modifica permanentemente le pause della frase catturata.
+
+## Sampler web
+
+Carica o trascina un WAV/MP3 (massimo 10 MB, 30 secondi, mono/stereo). Le 8 o 16 fette sono equidistanti; i pad consentono il preascolto. Sampler attiva la sequenza sul clock di Orbit, con Probabilità e Broken. Pitch cambia anche durata e velocità, senza time-stretch. Reverse inverte ogni fetta. Volume, attacco, coda e miscela effetti sono dedicati. Stop interrompe anche i pad.
+
+Salva progetto audio include campione originale, regolazioni e preset Orbit in un JSON locale da riaprire con Apri progetto audio. I normali preset, scene e MIDI non includono il sampler. WAV mix lo registra; le tre tracce separate restano synth/sub/batteria e non lo includono. Il campione non viene caricato su server. Nessun supporto sampler nel plugin nativo per ora.

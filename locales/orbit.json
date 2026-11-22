@@ -1206,6 +1206,120 @@
       "fr": "Voix désaccordées et harmoniques chaudes. À zéro, le son original reste intact.",
       "de": "Leicht verstimmte Stimmen und warme Obertöne. Bei null bleibt der Originalklang erhalten.",
       "es": "Capas desafinadas y armónicos cálidos. A cero, el sonido original no cambia."
+    },
+    "Armoniche sostenute, carattere da organo.": {
+      "en": "Sustained harmonics, organ character.",
+      "fr": "Harmoniques soutenues, caractère d’orgue.",
+      "de": "Lange Harmonien mit Orgelcharakter.",
+      "es": "Armónicos sostenidos, carácter de órgano."
+    },
+    "Attacco lento, armoniche calde.": {
+      "en": "Slow attack, warm harmonics.",
+      "fr": "Attaque lente, harmoniques chaudes.",
+      "de": "Langsamer Anschlag, warme Obertöne.",
+      "es": "Ataque lento, armónicos cálidos."
+    },
+    "Armoniche brillanti, trama cristallina.": {
+      "en": "Bright harmonics, crystalline texture.",
+      "fr": "Harmoniques brillantes, texture cristalline.",
+      "de": "Helle Obertöne, kristalline Textur.",
+      "es": "Armónicos brillantes, textura cristalina."
+    },
+    "Broken": {
+      "en": "Broken",
+      "fr": "Broken",
+      "de": "Broken",
+      "es": "Broken"
+    },
+    "Frammentazione": {
+      "en": "Fragmentation",
+      "fr": "Fragmentation",
+      "de": "Fragmentierung",
+      "es": "Fragmentación"
+    },
+    "Pause, note corte e rimbalzi in due o tre parti. A zero il groove resta originale.": {
+      "en": "Rests, short notes and two or three repeats. Zero preserves the original groove.",
+      "fr": "Silences, notes courtes et répétitions doubles ou triples. Zéro conserve le groove original.",
+      "de": "Pausen, kurze Noten und zwei oder drei Wiederholungen. Null erhält den ursprünglichen Groove.",
+      "es": "Silencios, notas cortas y repeticiones dobles o triples. Cero conserva el groove original."
+    },
+    "Sampler": {
+      "en": "Sampler",
+      "fr": "Sampler",
+      "de": "Sampler",
+      "es": "Sampler"
+    },
+    "Fette": {
+      "en": "Slices",
+      "fr": "Tranches",
+      "de": "Slices",
+      "es": "Fragmentos"
+    },
+    "Pitch": {
+      "en": "Pitch",
+      "fr": "Hauteur",
+      "de": "Tonhöhe",
+      "es": "Tono"
+    },
+    "Attacco": {
+      "en": "Attack",
+      "fr": "Attaque",
+      "de": "Attack",
+      "es": "Ataque"
+    },
+    "Coda": {
+      "en": "Release",
+      "fr": "Relâchement",
+      "de": "Release",
+      "es": "Cola"
+    },
+    "Volume": {
+      "en": "Volume",
+      "fr": "Volume",
+      "de": "Lautstärke",
+      "es": "Volumen"
+    },
+    "Effetti": {
+      "en": "Effects",
+      "fr": "Effets",
+      "de": "Effekte",
+      "es": "Efectos"
+    },
+    "Reverse": {
+      "en": "Reverse",
+      "fr": "Inverser",
+      "de": "Rückwärts",
+      "es": "Invertir"
+    },
+    "Salva progetto audio": {
+      "en": "Save audio project",
+      "fr": "Enregistrer projet audio",
+      "de": "Audioprojekt speichern",
+      "es": "Guardar proyecto de audio"
+    },
+    "Apri progetto audio": {
+      "en": "Open audio project",
+      "fr": "Ouvrir projet audio",
+      "de": "Audioprojekt öffnen",
+      "es": "Abrir proyecto de audio"
+    },
+    "Forma d’onda": {
+      "en": "Waveform",
+      "fr": "Forme d’onde",
+      "de": "Wellenform",
+      "es": "Forma de onda"
+    },
+    "WAV / MP3 · massimo 10 MB e 30 secondi · trascina qui": {
+      "en": "WAV / MP3 · max 10 MB and 30 seconds · drop here",
+      "fr": "WAV / MP3 · max 10 Mo et 30 secondes · déposer ici",
+      "de": "WAV / MP3 · max. 10 MB und 30 Sekunden · hier ablegen",
+      "es": "WAV / MP3 · máx. 10 MB y 30 segundos · arrastra aquí"
+    },
+    "Audio non valido · WAV / MP3, massimo 10 MB e 30 secondi.": {
+      "en": "Invalid audio · WAV / MP3, max 10 MB and 30 seconds.",
+      "fr": "Audio invalide · WAV / MP3, max 10 Mo et 30 secondes.",
+      "de": "Ungültiges Audio · WAV / MP3, max. 10 MB und 30 Sekunden.",
+      "es": "Audio no válido · WAV / MP3, máx. 10 MB y 30 segundos."
     }
   }
 }

@@ -23,7 +23,7 @@ public:
         const char* toggleNames[]={"Ascolta","Sync DAW","Flusso","Ritmo","Cassa","Clap","Hi-hat"};
         for(size_t i=0;i<buttons.size();++i){auto& b=buttons[i];b.setButtonText(toggleNames[i]);b.setClickingTogglesState(true);addAndMakeVisible(b);buttonLinks[i]=std::make_unique<State::ButtonAttachment>(owner.state,toggleIds[i],b);}
         addAndMakeVisible(capture);capture.setButtonText("Cattura la frase");capture.onClick=[this]{owner.capture();};capture.setTooltip("Conserva note, pause, durate e batteria. La frase si salva nella sessione DAW.");
-        scale.addItemList({"La minore","Do maggiore","La pentatonica"},1);sound.addItemList({"Glass","Rubber","Mist","Soft Keys","Bell"},1);accents.addItemList({"5 accenti","7 accenti","8 accenti"},1);
+        scale.addItemList({"La minore","Do maggiore","La pentatonica"},1);sound.addItemList({"Glass","Rubber","Mist","Soft Keys","Bell","Organ","Velvet","Prism"},1);accents.addItemList({"5 accenti","7 accenti","8 accenti"},1);
         for(auto* c:{&scale,&sound,&accents})addAndMakeVisible(c);
         scaleLink=std::make_unique<State::ComboBoxAttachment>(owner.state,"scale",scale);soundLink=std::make_unique<State::ComboBoxAttachment>(owner.state,"sound",sound);accentLink=std::make_unique<State::ComboBoxAttachment>(owner.state,"accents",accents);
         const char* sliderIds[]={"bpm","explore","tone","bass","volume","density","depth","drumVolume","synthVolume","body"};

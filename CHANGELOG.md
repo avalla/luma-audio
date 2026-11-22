@@ -1,5 +1,13 @@
 # Changelog
 
+## In sviluppo
+
+- Sampler web: carica o trascina un WAV/MP3, dividilo in 8 o 16 fette e suonale come pad; il progetto audio si salva in un JSON locale.
+
+- Broken sul web: Frammentazione introduce pause, gate corti e rimbalzi doppi/ternari sul clock audio; salvata nei preset e nelle scene. MIDI e plugin nativo conservano la frase di base.
+
+- Tre nuovi timbri sintetizzati su web e nativo: Organ, Velvet e Prism. Otto caratteri complessivi, salvabili nei preset e nelle scene.
+
 ## 0.5.0
 
 - Interfaccia Orbit web e nativa in italiano, inglese, francese, tedesco e spagnolo; scelta persistente senza interrompere audio o modificare i preset.

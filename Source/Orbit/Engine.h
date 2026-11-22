@@ -38,6 +38,9 @@ struct ToneVoice {
         double value=std::sin(2*pi*phase);
         if(shape==3)value=.75*value+.25*std::sin(4*pi*phase);
         if(shape==4)value=std::sin(2*pi*phase+1.5*std::exp(-age*6)*std::sin(4*pi*phase));
+        if(shape==5)value=.55*value+.3*std::sin(4*pi*phase)+.15*std::sin(6*pi*phase);
+        if(shape==6)value=.8*value+.2*std::sin(6*pi*phase);
+        if(shape==7)value=.6*value+.25*std::sin(4*pi*phase)+.15*std::sin(8*pi*phase);
         if(shape==1){value=0;for(int h=1;h<=15&&h*dt<.48;h+=2)value+=(h%4==1?1:-1)*std::sin(2*pi*h*phase)/(h*h);value*=8/(pi*pi);}
         if(shape==2)value=2*phase-1-blep(phase,dt);
         if(body>0)value=(value+body*(.32*std::sin(2*pi*bodyPhaseA)+.32*std::sin(2*pi*bodyPhaseB)+.18*std::sin(2*pi*bodyPhaseLow)))/(1+.82*body);
@@ -149,7 +152,7 @@ private:
         const int note=midi(notes[size_t(event.index)],settings.scale);
         auto& v=voices[size_t(voiceIndex++%8)];v={};v.shape=settings.sound;
         v.frequency=440*std::pow(2.0,(note-(settings.sound==1?12:0)-69)/12.0);
-        v.duration=settings.sound==2?.85:settings.sound==1?.3:settings.sound==4?1.2:.5;v.attack=settings.sound==2?.08:.006;v.level=currentAccent%2==0?.3f:.17f;
+        v.duration=settings.sound==5?1.0:settings.sound==6?1.4:settings.sound==7?.7:settings.sound==2?.85:settings.sound==1?.3:settings.sound==4?1.2:.5;v.attack=settings.sound==6?.12:settings.sound==5?.015:settings.sound==2?.08:.006;v.level=currentAccent%2==0?.3f:.17f;
         bassVoice={};bassVoice.frequency=440*std::pow(2.0,(note-24-69)/12.0);bassVoice.duration=.65;bassVoice.attack=.008;bassVoice.level=.5f;
     }
 };

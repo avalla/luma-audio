@@ -37,3 +37,5 @@ const stems=new StemProcessor();stems.port.onmessage({data:'start'});stems.proce
 assert.equal(stemMessages.at(-1).frames,2);assert.deepEqual(stemMessages.slice(0,3).map(m=>m.chunk.byteLength),[8,8,8]);assert(new DataView(stemMessages[0].chunk).getInt16(0,true)>0);assert(new DataView(stemMessages[1].chunk).getInt16(0,true)<0);assert.equal(new DataView(stemMessages[2].chunk).getInt16(0,true),0);
 stemMessages.length=0;stems.port.onmessage({data:'start'});for(let i=0;i<300;i++)stems.process([],[[new Float32Array(128)]]);assert.equal(stemMessages.at(-1).frames,30000);
 console.log('PASS: legacy migration, scene bank validation, swing bar length, Energy, parsed MIDI tracks and aligned stems');
+
+for(const sound of ['organ','velvet','prism']){const p=structuredClone(preset);p.sound=sound;assert.equal(require('./session.js').validate(p).sound,sound);}

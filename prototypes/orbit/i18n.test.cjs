@@ -17,7 +17,7 @@ for(const lang of Object.keys(i18n.catalog.languages)){
 assert.equal(i18n.translate('Ascolta','xx'),'Play');
 // Static copy cannot silently fall back to Italian when new UI text is added.
 const html=fs.readFileSync(__dirname+'/index.html','utf8');
-const unchanged=new Set(['luma','/ orbit','ORBIT 0.5','ORBIT','BPM','Glass','Rubber','Mist','Soft Keys','Bell','Clap','Hi-hat','Intro','Groove','Swing',...Object.values(i18n.catalog.languages)]);
+const unchanged=new Set(['luma','/ orbit','ORBIT 0.5','ORBIT','BPM','Glass','Rubber','Mist','Soft Keys','Bell','Organ','Velvet','Prism','Clap','Hi-hat','Intro','Groove','Swing',...Object.values(i18n.catalog.languages)]);
 const staticText=[...html.matchAll(/>([^<>]+)</g)].map(m=>m[1].trim()).filter(s=>/[A-Za-zÀ-ÿ]/.test(s));
 const labels=[...html.matchAll(/aria-label="([^"]+)"/g)].map(m=>m[1]);
 for(const key of [...staticText,...labels])assert(unchanged.has(key)||Object.hasOwn(i18n.catalog.messages,key),`Missing catalog message: ${key}`);
