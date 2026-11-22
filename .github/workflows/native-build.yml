@@ -71,7 +71,7 @@ jobs:
         run: bun scripts/generate_acido_demos.cjs --check
 
       - name: Configure
-        run: eval cmake -S . -B build-native -DJUCE_SOURCE_DIR='"$GITHUB_WORKSPACE/build-deps/JUCE"' ${{ matrix.configure }}
+        run: cmake -S . -B build-native -DJUCE_SOURCE_DIR="${GITHUB_WORKSPACE//\\//}/build-deps/JUCE" ${{ matrix.configure }}
 
       - name: Build plugins, apps and tests
         run: cmake --build build-native --config Release --parallel 4 --target ${{ matrix.targets }}
