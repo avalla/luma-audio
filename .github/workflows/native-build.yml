@@ -113,4 +113,5 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
           RELEASE_TAG: ${{ github.ref_name }}
-        run: gh release create "$RELEASE_TAG" delivery/*.zip --verify-tag --title "Luma Audio ${RELEASE_TAG#luma-v}" --generate-notes
+        # Not "latest": the Orbit download links point to the latest release.
+        run: gh release create "$RELEASE_TAG" delivery/*.zip --verify-tag --latest=false --title "Luma Audio ${RELEASE_TAG#luma-v}" --generate-notes
