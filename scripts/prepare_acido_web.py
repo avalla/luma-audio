@@ -10,5 +10,5 @@ if destination.exists():
     shutil.rmtree(destination)
 destination.mkdir(parents=True)
 for name in FILES:
-    shutil.copy2(root / "prototypes" / "acido" / name, destination / name)
+    shutil.copy2(root / "apps" / "acido" / name, destination / name)
 print(f"Prepared {len(FILES)} public assets in {destination}")

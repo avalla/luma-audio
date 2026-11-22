@@ -6,11 +6,12 @@ on:
     branches: [main]
     tags: ['orbit-v*']
     paths:
-      - 'Source/**'
-      - 'locales/**'
+      - 'plugins/**'
+      - 'packages/orbit-locales/**'
       - 'scripts/generate_orbit_locales.py'
-      - 'Tests/**'
-      - 'prototypes/orbit/**'
+      - 'apps/orbit/**'
+      - 'package.json'
+      - 'bun.lock'
       - 'CMakeLists.txt'
       - 'scripts/package_orbit.py'
       - 'docs/Luma-Orbit.md'
@@ -44,15 +45,16 @@ jobs:
           path: build-deps/JUCE
           persist-credentials: false
 
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.0
+
+      - name: Install workspace
+        run: bun install --frozen-lockfile
+
       - name: Test web sequencer and files
-        run: |
-          python3 scripts/generate_orbit_locales.py --check
-          node prototypes/orbit/i18n.test.cjs
-          node prototypes/orbit/flow.test.cjs
-          node prototypes/orbit/sampler.test.cjs
-          node prototypes/orbit/broken.test.cjs
-          node prototypes/orbit/clock.test.cjs
-          node prototypes/orbit/session.test.cjs
+        run: bun run --filter '@luma/{orbit,orbit-locales}' test
 
       - name: Configure Intel and Apple Silicon
         run: >-
@@ -72,7 +74,7 @@ jobs:
         run: ctest --test-dir build-universal -R orbit_sequencer --output-on-failure
 
       - name: Verify native and web preset interchange
-        run: node prototypes/orbit/interchange.test.cjs build-universal/orbit-native-preset.json
+        run: bun run apps/orbit/interchange.test.cjs build-universal/orbit-native-preset.json
 
       - name: Package and verify architectures and signatures
         run: python3 scripts/package_orbit.py --build-dir build-universal --juce-dir build-deps/JUCE

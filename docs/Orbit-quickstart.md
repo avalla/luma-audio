@@ -87,7 +87,7 @@ avvia Play oppure disattiva Sync DAW per usare Ascolta. Su iPhone verifica volum
 multimediale, uscita Bluetooth/AirPlay e, se necessario, modalità silenziosa;
 prova ad aprire direttamente la pagina in Safari e premi di nuovo Ascolta.
 
-Dettagli: [guida web](../prototypes/orbit/README.md), [guida nativa](Luma-Orbit.md),
+Dettagli: [guida web](../apps/orbit/README.md), [guida nativa](Luma-Orbit.md),
 [changelog](../CHANGELOG.md).
 
 ## Nuovi timbri

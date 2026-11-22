@@ -1,5 +1,5 @@
-#include "../Source/Orbit/Processor.h"
-#include "../Source/Orbit/Localization.h"
+#include "../src/Processor.h"
+#include "../src/Localization.h"
 #include <iostream>
 #include <stdexcept>
 using namespace juce;

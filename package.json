@@ -1,0 +1,25 @@
+{
+  "name": "luma-audio",
+  "private": true,
+  "packageManager": "bun@1.4.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:orbit": "bun run --filter @luma/orbit dev",
+    "dev:acido": "bun run --filter @luma/acido dev",
+    "test": "bun run test:web && bun run build:native && bun run test:native && bun run test:interchange",
+    "test:web": "bun run --filter '@luma/*' test",
+    "test:native": "ctest --test-dir build --output-on-failure",
+    "test:interchange": "bun run apps/orbit/interchange.test.cjs build/orbit-native-preset.json",
+    "build:web": "bun run --filter '@luma/{orbit,acido}' build",
+    "build:native": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j 8",
+    "locales": "python3 scripts/generate_orbit_locales.py",
+    "deploy:orbit": "bun run --filter @luma/orbit deploy",
+    "deploy:acido": "bun run --filter @luma/acido deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.158.0"
+  }
+}

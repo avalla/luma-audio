@@ -22,7 +22,7 @@ Guide: [Italiano](https://github.com/avalla/luma-orbit/blob/main/docs/Orbit-quic
 
 [Guida rapida](../../docs/Orbit-quickstart.md) · [Changelog](../../CHANGELOG.md) · [Guida nativa](../../docs/Luma-Orbit.md)
 
-Apri https://orbit.avalla.dev e premi **Ascolta**. Per sviluppo locale usa `python3 -m http.server 8765 --directory prototypes/orbit` dalla radice e apri http://localhost:8765. La registrazione AudioWorklet richiede HTTPS o localhost. Nessuna dipendenza frontend o accesso al microfono.
+Apri https://orbit.avalla.dev e premi **Ascolta**. Per sviluppo locale usa `bun run dev:orbit` dalla radice e apri http://localhost:8765. La registrazione AudioWorklet richiede HTTPS o localhost. Nessuna dipendenza frontend o accesso al microfono.
 
 - Otto note modificabili nella scala scelta; ogni passo può essere bloccato.
 - Accenti su un ciclo indipendente di 5, 7 o 8 passi.
@@ -33,7 +33,7 @@ Apri https://orbit.avalla.dev e premi **Ascolta**. Per sviluppo locale usa `pyth
 
 Le evoluzioni automatiche non riempiono la cronologia. Annullare Cattura ripristina la modalità precedente e la frase al momento della cattura. Salva preset conserva un file JSON da riaprire con Apri preset.
 
-Verifica del generatore: `node prototypes/orbit/flow.test.cjs` dalla radice del progetto. Il test usa casualità deterministica e verifica 200 frasi, blocchi, limiti, pause, lunghezze e variazione zero.
+Verifica del generatore: `bun run apps/orbit/flow.test.cjs` dalla radice del progetto. Il test usa casualità deterministica e verifica 200 frasi, blocchi, limiti, pause, lunghezze e variazione zero.
 - Cinque timbri: Glass, Rubber, Mist, Soft Keys (armoniche morbide) e Bell (sintesi FM). Luminosità e volume generale restano indipendenti.
 - Sub intonato: una sinusoide segue la nota due ottave sotto, con volume dedicato e attenuazione iniziale quando coincide con la cassa. Stop cancella anche sub e modulatore FM.
 - Batteria elettronica sintetizzata: cassa sinusoidale con discesa di frequenza, clap e hi-hat da rumore filtrato. Nessun campione esterno. Cassa, clap e hi-hat si attivano separatamente; densità controlla colpi aggiuntivi, profondità regola frequenza finale e coda della cassa. Volume ritmo regola il kit; Volume generale regola synth e batteria insieme.
@@ -85,9 +85,9 @@ sull'altoparlante di un iPhone fisico resta distinta dai test browser desktop.
 Dalla radice del repository:
 
 ```sh
-node prototypes/orbit/flow.test.cjs
-node prototypes/orbit/clock.test.cjs
-node prototypes/orbit/session.test.cjs
+bun run apps/orbit/flow.test.cjs
+bun run apps/orbit/clock.test.cjs
+bun run apps/orbit/session.test.cjs
 ```
 
 I test coprono generazione, clock, migrazione dei preset, scene, swing, Energia,
@@ -95,7 +95,7 @@ MIDI, PCM stereo, tracce allineate, clipping, limite di registrazione e Stop.
 Dopo aver compilato ed eseguito `LumaOrbitTests`, controlla anche lo scambio con il nativo:
 
 ```sh
-node prototypes/orbit/interchange.test.cjs build-universal/orbit-native-preset.json
+bun run apps/orbit/interchange.test.cjs build-universal/orbit-native-preset.json
 ```
 
 Il file in ingresso è generato dal test nativo, non dal server web.
@@ -104,17 +104,13 @@ Le istruzioni per produrlo sono nella [guida nativa](../../docs/Luma-Orbit.md#co
 ## Pubblicazione
 
 Sito: https://orbit.avalla.dev, Cloudflare Workers Static Assets, Worker `luma-orbit`.
-La configurazione è `../../wrangler.orbit.jsonc`. Dalla radice:
+La configurazione è `wrangler.jsonc`. Dalla radice del repository:
 
 ```sh
-node prototypes/orbit/flow.test.cjs
-node prototypes/orbit/clock.test.cjs
-node prototypes/orbit/session.test.cjs
-python3 scripts/prepare_orbit_web.py
-npx wrangler@4.158.0 deploy --config wrangler.orbit.jsonc
+bun run deploy:orbit
 ```
 
-Lo staging copia solo i dodici file pubblici in `build/orbit-web`; test, documentazione e plugin nativi non vengono caricati. L'autenticazione resta nella configurazione locale di Wrangler.
+Lo staging copia solo i quattordici file pubblici in `build/orbit-web`; test, documentazione e plugin nativi non vengono caricati. L'autenticazione resta nella configurazione locale di Wrangler.
 
 Il prototipo è distinto dai plugin Luma e Luma RMS esistenti: usa Web Audio, non il motore JUCE. La versione web non riceve MIDI né sincronizzazione DAW; il plugin nativo è separato e disponibile in questo repository; i preset JSON conservano le sequenze dopo la chiusura. Il sequencer pianifica note e batteria su AudioContext.currentTime con 100 ms di anticipo; un timer di 25 ms alimenta la coda senza determinare gli istanti di attacco. I cursori seguono il tempo di uscita audio tramite getOutputTimestamp, quando disponibile. Le modifiche ai parametri si applicano ai prossimi eventi non ancora programmati. Blocchi del thread principale oltre la finestra di anticipo possono interrompere il ritmo: il clock riparte senza raffiche di eventi arretrati. Cambiare scheda ferma l'audio.
 

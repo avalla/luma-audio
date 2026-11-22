@@ -1,4 +1,4 @@
-"""Generate both UI catalogs from locales/orbit.json; --check detects stale outputs."""
+"""Generate both UI catalogs from packages/orbit-locales/orbit.json; --check detects stale outputs."""
 import argparse
 import json
 import re
@@ -8,7 +8,7 @@ root = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser()
 parser.add_argument('--check', action='store_true')
 args = parser.parse_args()
-catalog = json.loads((root / 'locales/orbit.json').read_text())
+catalog = json.loads((root / 'packages/orbit-locales/orbit.json').read_text())
 languages = list(catalog['languages'])
 assert languages[0] == 'it' and 'en' in languages
 for source, translations in catalog['messages'].items():
@@ -27,7 +27,7 @@ header += f'struct Entry {{const char* source;const char* values[{len(languages)
 for source, translations in catalog['messages'].items():
     header += '    {' + quote(source) + ',{' + ','.join(quote(source if k == 'it' else translations[k]) for k in languages) + '}},\n'
 header += '};\n}\n'
-for relative, content in [('prototypes/orbit/translations.js', js), ('Source/Orbit/Translations.h', header)]:
+for relative, content in [('apps/orbit/translations.js', js), ('plugins/orbit/src/Translations.h', header)]:
     path = root / relative
     if args.check:
         assert path.exists() and path.read_text() == content, f'Stale catalog: {relative}'

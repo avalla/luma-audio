@@ -1,11 +1,11 @@
 # ACIDO — bassline acida
 
-Prototipo web di un synth basso monofonico nello stile delle bassline acid: oscillatore saw/square, filtro risonante a 4 poli, inviluppo con decay, accent, slide e sequencer a 16 passi. Nessuna installazione npm, build o dipendenza remota.
+Prototipo web di un synth basso monofonico nello stile delle bassline acid: oscillatore saw/square, filtro risonante a 4 poli, inviluppo con decay, accent, slide e sequencer a 16 passi. Nessuna build o dipendenza remota.
 
 ## Avvio
 
 ```sh
-python3 -m http.server 8767 --bind 127.0.0.1 --directory prototypes/acido
+bun run dev:acido
 ```
 
 Aprire <http://127.0.0.1:8767> e premere **Play**. Serve AudioWorklet (localhost o HTTPS).
@@ -75,24 +75,22 @@ Il motore è scritto per un porting 1:1 in C++: stessi stati, coefficienti e ord
 ## Verifica
 
 ```sh
-node --test prototypes/acido/acido.test.cjs prototypes/acido/i18n.test.cjs prototypes/acido/features.test.cjs prototypes/acido/song.test.cjs prototypes/acido/demos.test.cjs
+bun run --filter @luma/acido test
 ```
 
 Preset a 44,1/48 kHz finiti e limitati, estremi dei parametri, determinismo, timing dei passi senza deriva su 10 s, slide (gate tenuto, nessun retrigger, glide), accent, distorsione (bypass esatto, limiti, armoniche, livello, tono), swing, gate per passo, pattern in coda a fine giro, catena e salto nella catena, slide tra pattern, migrazione dello stato v1, glitch (bypass esatto, determinismo, periodo dello stutter, reverse, rallentamento del tape stop, crush, clock libero), cassa (4/4 dritta con swing e pattern dispari, livello 0 muto, energia sotto 150 Hz, sidechain), panic, validazione/roundtrip.
 
 ## Pubblicazione
 
-Online su <https://acido.avalla.dev> (Cloudflare Workers, solo asset statici). Configurazione in `../../wrangler.acido.jsonc`. Dalla radice:
+Online su <https://acido.avalla.dev> (Cloudflare Workers, solo asset statici). Configurazione in `wrangler.jsonc`. Dalla radice del repository:
 
 ```sh
-node --test prototypes/acido/acido.test.cjs prototypes/acido/i18n.test.cjs prototypes/acido/features.test.cjs prototypes/acido/song.test.cjs prototypes/acido/demos.test.cjs
-python3 scripts/prepare_acido_web.py
-npx --yes --package=wrangler@4.158.0 -- wrangler deploy --config wrangler.acido.jsonc
+bun run deploy:acido
 ```
 
-Lo staging copia in `build/acido-web` solo i nove file pubblici (niente test né README). L'autenticazione resta nella configurazione locale di Wrangler.
+Lo staging copia in `build/acido-web` solo i diciannove file pubblici (niente test né README). L'autenticazione resta nella configurazione locale di Wrangler.
 
 ## Prossimi passi
 
-1. Standalone + VST3 + AU con JUCE (`Source/Acido/`), stesso DSP portato in C++, test di confronto con il rendering JS.
+1. Standalone + VST3 + AU con JUCE (`plugins/acido/`), stesso DSP portato in C++, test di confronto con il rendering JS.
 2. Nel plugin: sync del sequencer al tempo/trasporto dell'host, oppure suonabile via MIDI (note sovrapposte = slide, velocity alta = accent).

@@ -2,27 +2,30 @@
 
 ## Project Structure & Module Organization
 
-- `Source/`: C++17/JUCE synth, parameters, voices, processor, and editor. `Source/Rms/` contains the independent RMS plugin.
-- `Tests/`: native console tests registered with CTest.
-- `prototypes/orbit/`: standalone HTML/CSS/JavaScript instrument. `flow.js` generates phrases, `clock.js` schedules audio, `drums.js` synthesizes percussion, and `orbit.js` connects playback and UI.
-- `Audio/`: generated MP3 test fixture. `docs/` contains installation notes.
-- `scripts/`: packaging and web staging utilities. `PRODUCT.md` and `DESIGN.md` describe UI intent.
+Bun workspace monorepo.
+
+- `apps/orbit/`: standalone HTML/CSS/JavaScript instrument. `flow.js` generates phrases, `clock.js` schedules audio, `drums.js` synthesizes percussion, and `orbit.js` connects playback and UI.
+- `apps/acido/`: standalone acid bass synth. DSP files are DOM-free and written for a future C++ port.
+- `plugins/luma/`, `plugins/orbit/`, `plugins/rms/`: C++17/JUCE plugins, each with `src/` and `tests/`. All are built by the root `CMakeLists.txt`.
+- `packages/orbit-locales/`: translation catalog that generates Orbit's web and native strings.
+- `docs/` contains guides and installation notes. `scripts/` holds packaging, web staging and the local server. `PRODUCT.md` and `DESIGN.md` describe UI intent.
 - `build/` and `build-*/`: ignored outputs; never commit compiled plugins.
 
 ## Build, Test, and Development Commands
 
-Run commands from the repository root. Native builds require macOS, Xcode Command Line Tools, and CMake 3.22+. JUCE is pinned and fetched automatically; use `-DJUCE_SOURCE_DIR=/path/to/JUCE` for a local checkout.
+Run commands from the repository root. Use Bun, never npm or npx. Native builds require macOS, Xcode Command Line Tools, and CMake 3.22+. JUCE is pinned and fetched automatically; use `-DJUCE_SOURCE_DIR=/path/to/JUCE` for a local checkout.
 
 ```sh
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build -j 8
-ctest --test-dir build --output-on-failure
-node prototypes/orbit/flow.test.cjs
-node prototypes/orbit/clock.test.cjs
-python3 -m http.server 8765 --directory prototypes/orbit
+bun install
+bun run dev:orbit     # http://127.0.0.1:8765
+bun run dev:acido     # http://127.0.0.1:8767
+bun run test:web
+bun run build:native
+bun run test:native
+bun run test
 ```
 
-The commands configure/build native targets, run native and web logic tests, and serve Orbit at `http://localhost:8765`. Orbit needs no npm installation or frontend build.
+The web apps need no frontend build.
 
 ## Coding Style & Naming Conventions
 
@@ -32,7 +35,7 @@ No repository-wide formatter or linter is configured. Avoid unrelated reformatti
 
 ## Testing Guidelines
 
-Native tests are custom executables: `synth_smoke` and `rms_measurement`. Web tests use Node's `assert/strict` in `*.test.cjs` files. No numeric coverage threshold exists. Add focused regression checks for changed behavior, especially timing, cancellation, locked notes, RMS accuracy, and state restoration. For UI/audio changes, also verify playback, stop, and responsive layout in a browser.
+Native tests are custom executables: `synth_smoke`, `rms_measurement` and `orbit_sequencer`. Web tests are `*.test.cjs` files run with Bun. No numeric coverage threshold exists. Add focused regression checks for changed behavior, especially timing, cancellation, locked notes, RMS accuracy, and state restoration. For UI/audio changes, also verify playback, stop, and responsive layout in a browser.
 
 ## Commit & Pull Request Guidelines
 
@@ -40,4 +43,4 @@ History currently contains one descriptive initial commit; no enforced prefix co
 
 ## Configuration & Deployment
 
-Keep credentials, `.env` files, Wrangler state, and Audacity sessions untracked. `scripts/prepare_orbit_web.py` stages an explicit asset allowlist. `wrangler.orbit.jsonc` targets the live site; deploy only when requested. Consult the Orbit README for deployment commands.
+Keep credentials, `.env` files, Wrangler state, and Audacity sessions untracked. `scripts/prepare_orbit_web.py` stages an explicit asset allowlist. Each app's `wrangler.jsonc` targets its live site; deploy only when requested, with `bun run deploy:orbit` or `bun run deploy:acido`.

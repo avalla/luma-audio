@@ -30,11 +30,11 @@ for artifact, name in [('Luma_artefacts', 'Luma'), ('LumaRms_artefacts', 'Luma R
             raise RuntimeError(f'Unexpected architecture: {arch}')
 source = package / 'Sorgenti/Luma'
 source.mkdir(parents=True, exist_ok=True)
-for name in ['Source', 'Tests', 'docs', 'scripts']:
+for name in ['plugins', 'docs', 'scripts']:
     shutil.copytree(root / name, source / name, dirs_exist_ok=True)
 for name in ['CMakeLists.txt', 'README.md', '.gitignore', 'LICENSE']:
     shutil.copy2(root / name, source / name)
-shutil.copy2(root / 'Audio/Prova-RMS.mp3', package / 'Prova-RMS.mp3')
+shutil.copy2(root / 'plugins/rms/assets/Prova-RMS.mp3', package / 'Prova-RMS.mp3')
 shutil.copy2(juce_dir / 'LICENSE.md', package / 'JUCE-LICENSE.md')
 shutil.copy2(root / 'LICENSE', package / 'LICENSE')
 subprocess.run(['tar', '-czf', str(package / 'Sorgenti/JUCE-8.0.13.tar.gz'),
@@ -93,6 +93,6 @@ with zipfile.ZipFile(archive) as zipped:
         raise RuntimeError(f'Corrupt entry: {bad}')
     for name in ['VST3/Luma.vst3/Contents/MacOS/Luma', 'AU/Luma.component/Contents/MacOS/Luma',
                  'VST3/Luma RMS.vst3/Contents/MacOS/Luma RMS', 'AU/Luma RMS.component/Contents/MacOS/Luma RMS',
-                 'LEGGIMI.txt', 'LICENSE', 'Sorgenti/Luma/LICENSE', 'Prova-RMS.mp3', 'Sorgenti/Luma/Source/Rms/Processor.cpp', 'Sorgenti/JUCE-8.0.13.tar.gz']:
+                 'LEGGIMI.txt', 'LICENSE', 'Sorgenti/Luma/LICENSE', 'Prova-RMS.mp3', 'Sorgenti/Luma/plugins/rms/src/Processor.cpp', 'Sorgenti/JUCE-8.0.13.tar.gz']:
         zipped.getinfo(package.name + '/' + name)
 print(f'Verified: {archive} ({archive.stat().st_size / 1024**2:.1f} MB)')

@@ -1,4 +1,4 @@
-#include "../Source/Plugin.h"
+#include "../src/Plugin.h"
 using namespace juce;
 #include <iostream>
 int main() {

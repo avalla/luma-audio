@@ -78,4 +78,4 @@ Luma Synth e Luma RMS mantengono versioni proprie.
 - Build universali Intel/Apple Silicon e pacchetti scaricabili tramite GitHub Actions.
 
 Vedi il [tag 0.2.0](https://github.com/avalla/luma-orbit/tree/orbit-v0.2.0),
-la [guida nativa](docs/Luma-Orbit.md) e la [guida web](prototypes/orbit/README.md).
+la [guida nativa](docs/Luma-Orbit.md) e la [guida web](apps/orbit/README.md).

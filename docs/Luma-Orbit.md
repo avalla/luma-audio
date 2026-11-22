@@ -24,7 +24,7 @@ Synth e sequencer generativo con batteria elettronica, sub intonato e cinque tim
 Glass, Rubber, Mist, Soft Keys e Bell. Il motore C++ genera l'audio direttamente
 nel callback della DAW; non incorpora browser, JavaScript o servizi remoti.
 
-[Guida rapida](Orbit-quickstart.md) · [Changelog](../CHANGELOG.md) · [Guida web](../prototypes/orbit/README.md)
+[Guida rapida](Orbit-quickstart.md) · [Changelog](../CHANGELOG.md) · [Guida web](../apps/orbit/README.md)
 
 ## Installazione macOS
 
@@ -136,10 +136,10 @@ cmake -S . -B build-universal -DCMAKE_BUILD_TYPE=Release \
   '-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13
 cmake --build build-universal --target LumaOrbit_VST3 LumaOrbit_AU LumaOrbit_Standalone LumaOrbitTests -j 8
 ctest --test-dir build-universal -R orbit_sequencer --output-on-failure
-node prototypes/orbit/flow.test.cjs
-node prototypes/orbit/clock.test.cjs
-node prototypes/orbit/session.test.cjs
-node prototypes/orbit/interchange.test.cjs build-universal/orbit-native-preset.json
+bun run apps/orbit/flow.test.cjs
+bun run apps/orbit/clock.test.cjs
+bun run apps/orbit/session.test.cjs
+bun run apps/orbit/interchange.test.cjs build-universal/orbit-native-preset.json
 ```
 
 Aggiungi `-DJUCE_SOURCE_DIR=/percorso/JUCE` se disponi di JUCE 8.0.13 locale.

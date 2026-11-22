@@ -1,0 +1,11 @@
+{
+  "name": "@luma/orbit",
+  "version": "0.5.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun ../../scripts/serve.ts . 8765",
+    "test": "bun run i18n.test.cjs && bun run flow.test.cjs && bun run sampler.test.cjs && bun run broken.test.cjs && bun run clock.test.cjs && bun run session.test.cjs",
+    "build": "python3 ../../scripts/prepare_orbit_web.py",
+    "deploy": "bun run test && bun run build && wrangler deploy"
+  }
+}
