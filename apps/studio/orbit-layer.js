@@ -15,10 +15,11 @@
    this.sr=sr;this.on=new Uint8Array(VOICES);this.phase=new Float64Array(VOICES);this.inc=new Float64Array(VOICES);this.env=new Float64Array(VOICES);
    this.peak=new Float64Array(VOICES);this.rise=new Float64Array(VOICES);this.fall=new Float64Array(VOICES);this.rising=new Uint8Array(VOICES);this.table=TABLES[0];
    this.deg=new Int8Array(0);this.beats=new Uint8Array(0);this.pitches=new Int16Array(8);this.pcs=new Int8Array(12);this.nPcs=0;
-   this.level=.7;this.send=.25;this.transpose=0;this.octave=0;this.sound=0;this.lp=1;this.lpL=0;this.lpR=0;this.l=0;this.r=0;this.next=0;this.root=-1;
-   this.fast=Math.exp(-6.9/(.012*sr));this.setTone(.6);
+   this.level=.7;this.send=.25;this.transpose=0;this.octave=0;this.part=null;this.clock=null;this.sound=0;this.lp=1;this.lpL=0;this.lpR=0;this.l=0;this.r=0;this.next=0;this.root=-1;
+   this.drive=1;this.driveTo=1;this.driveSlew=1-Math.exp(-1/(.02*sr));this.fast=Math.exp(-6.9/(.012*sr));this.setTone(.6);
   }
   setTone(v){const fc=Math.min(this.sr*.45,300+v*v*12000);this.lp=1-Math.exp(-TAU*fc/this.sr);}
+  setDrive(v){if(Number.isFinite(v))this.driveTo=1+Math.min(1,Math.max(0,v))*60;}
   setSound(id){const i=SOUNDS.indexOf(id);if(i>=0){this.sound=i;this.table=TABLES[i];}}
   // scale: pitch classes starting from the tonic.
   setScale(scale){
@@ -27,6 +28,14 @@
    for(let d=1;d<8;d++){const pc=scale[d%n],up=((pc-last%12)%12+12)%12;last+=up||12;this.pitches[d]=last;}
   }
   setPhrase(deg,beats){this.deg=deg;this.beats=beats;}
+  // A written part replaces the generated phrase. It follows the song position, so section jumps stay in place.
+  setPart(part){this.part=part||null;}
+  playPart(len,muted){
+   const q=this.clock,x=this.part;if(!q||muted)return;
+   const at=x.start[q.secI]+(q.secRep*x.size[q.secI]+q.secPos)*16+q.step;if(at+1>=x.index.length)return;
+   const decay=TIMBRES[SOUNDS[this.sound]][2];
+   for(let i=x.index[at];i<x.index[at+1];i++){const seconds=x.len[i]*len/this.sr*1.5;this.noteOn(x.pitch[i]+this.transpose+this.octave*12,.16,(seconds>.09?seconds:.09)/decay);}
+  }
   restart(){this.root=-1;}
   stop(){for(let i=0;i<VOICES;i++)if(this.on[i]){this.rising[i]=0;this.fall[i]=this.fast;}}
   reset(){this.on.fill(0);this.env.fill(0);this.lpL=this.lpR=this.l=this.r=0;this.root=-1;}
@@ -44,6 +53,7 @@
   // Called by the sequencer on every step: one Orbit pulse is two steps.
   step(count,len,s,muted){
    if(s&&s.bass>=0)this.root=((36+(s.bassOct||0)*12+s.bass+this.transpose)%12+12)%12;
+   if(this.part){this.playPart(len,muted);return;}
    if(count%2)return;
    const n=this.deg.length;if(!n)return;
    const pulse=(count/2)%n,d=this.deg[pulse];
@@ -68,6 +78,12 @@
     if(this.rising[i]){this.env[i]+=this.rise[i];if(this.env[i]>=this.peak[i]){this.env[i]=this.peak[i];this.rising[i]=0;}}
     else{this.env[i]*=this.fall[i];if(this.env[i]<1e-5){this.env[i]=0;this.on[i]=0;}}
    }
+   // Soft clipping before the tone filter, which then acts like a guitar cabinet. At zero the signal is untouched.
+   if(this.drive!==1||this.driveTo!==1){
+    let g=this.drive+(this.driveTo-this.drive)*this.driveSlew;if(Math.abs(this.driveTo-g)<.001)g=this.driveTo;this.drive=g;
+    const wet=Math.min(1,(g-1)/2),k=1/Math.sqrt(g),xa=a*g,xb=b*g;
+    a+=(xa/(1+Math.abs(xa))*k-a)*wet;b+=(xb/(1+Math.abs(xb))*k-b)*wet;
+   }
    this.lpL+=(a-this.lpL)*this.lp;this.lpR+=(b-this.lpR)*this.lp;
    this.l=this.lpL*this.level*MAKEUP;this.r=this.lpR*this.level*MAKEUP;
   }
@@ -84,6 +100,21 @@
   }
   return {deg:Int8Array.from(deg),beats:Uint8Array.from(beats)};
  }
- const api={OrbitLayer,SOUNDS,buildTimeline};
+ // Validates an untrusted part from a link. data.e is a flat list of step delta, MIDI pitch and length in steps.
+ function buildPart(state,data){
+  const sections=state.song?.sections||[],e=data?.e,start=new Uint32Array(16),size=new Uint16Array(16);let bars=0;
+  if(!state.song?.on||!sections.length||!Array.isArray(e)||e.length%3||e.length>72000)throw new Error('BAD_PART');
+  sections.forEach((x,i)=>{if(x.patterns.some(p=>state.patterns[p].length!==16))throw new Error('BAD_PART');start[i]=bars*16;size[i]=x.patterns.length;bars+=x.patterns.length*x.repeat;});
+  const total=bars*16;if(!total||total>20000)throw new Error('BAD_PART');
+  const n=e.length/3,index=new Uint32Array(total+1),pitch=new Uint8Array(n),len=new Uint8Array(n);let at=0;
+  for(let i=0;i<n;i++){
+   const d=e[i*3],p=e[i*3+1],l=e[i*3+2];at+=d;
+   if(!Number.isInteger(d)||d<0||at>=total||!Number.isInteger(p)||p<24||p>96||!Number.isInteger(l)||l<1||l>64)throw new Error('BAD_PART');
+   index[at+1]++;pitch[i]=p;len[i]=l;
+  }
+  for(let i=0;i<total;i++)index[i+1]+=index[i];
+  return {index,pitch,len,start,size};
+ }
+ const api={OrbitLayer,SOUNDS,buildTimeline,buildPart};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.LumaOrbitLayer=api;
 })(globalThis);

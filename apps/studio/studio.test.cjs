@@ -1,6 +1,6 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const S=require('../acido/session.js'),{Engine}=require('../acido/engine.js'),{Sequencer}=require('../acido/sequencer.js'),{renderState}=require('../acido/render.js'),{demos,defs}=require('../acido/demos.js'),Flow=require('../orbit/flow.js');
-const {OrbitLayer,SOUNDS,buildTimeline}=require('./orbit-layer.js'),{Mixer,CHANNELS}=require('./mixer.js');
+const {OrbitLayer,SOUNDS,buildTimeline,buildPart}=require('./orbit-layer.js'),{Mixer,CHANNELS}=require('./mixer.js');
 const NOTES=[0,4,2,6,4,7,2,3],SR=22050;
 const timeline=(seed=3,amount=.35)=>buildTimeline(Flow,{notes:NOTES,amount,seed});
 function studio(d,{level=.55,send=.3,sound='glass',lead=1,sr=SR,seconds=8,duck,params,mixer}={}){
@@ -129,6 +129,19 @@ test('live control: a held knob wins over the song automation',()=>{
  const e=new Engine(SR),q=new Sequencer(SR),p=S.emptyPattern();p.auto={cutoff:new Array(16).fill(.9)};e.sequence=q;q.configure({tempo:120,swing:.5,patterns:[p],chain:[]});q.select(0);q.start(e);
  const L=new Float32Array(128),R=new Float32Array(128),run=()=>{for(let b=0;b<40;b++)e.process(L,R,128);};
  run();assert.equal(e.auto.cutoff,.9);q.hold('cutoff',true,e);run();assert.equal(e.auto.cutoff,-1);q.hold('cutoff',false,e);run();assert.equal(e.auto.cutoff,.9);
+});
+test('a written Orbit part plays chords on the song position and rejects bad links',()=>{
+ const song={on:true,sections:[{name:'A',patterns:[0],repeat:2,mute:{}},{name:'B',patterns:[1],repeat:1,mute:{}}]},state={song,patterns:[S.emptyPattern(),S.emptyPattern()]};
+ const part=buildPart(state,{e:[0,48,4,0,55,4,20,60,2]}),l=new OrbitLayer(SR),heard=[],clock={secI:0,secRep:0,secPos:0,step:0};l.clock=clock;l.transpose=2;l.setPart(part);l.noteOn=p=>heard.push(p);
+ l.step(0,100,null,false);assert.deepEqual(heard,[50,57]);heard.length=0;
+ clock.secRep=1;clock.step=4;l.step(1,100,null,true);assert.equal(heard.length,0);l.step(1,100,null,false);assert.deepEqual(heard,[62]);
+ for(const bad of [{e:[0,48]},{e:[9999,48,1]},{e:[-1,48,1]},{e:[0,127,1]},{e:[0,48,99]},{e:'x'}])assert.throws(()=>buildPart(state,bad));
+ assert.throws(()=>buildPart({song:{on:false,sections:[]},patterns:[]},{e:[]}));
+});
+test('Orbit distortion is off by default, bounded when on and ignores bad values',()=>{
+ const run=d=>{const l=new OrbitLayer(SR);l.setSound('rubber');if(d!==null)l.setDrive(d);for(const p of [40,47,52])l.noteOn(p,.16,1);const out=[];for(let i=0;i<4800;i++){l.process();out.push(l.l);}return out;};
+ const off=run(null),hot=run(1);assert.deepEqual(run(0),off);assert.deepEqual(run(NaN),off);assert.notDeepEqual(hot,off);
+ assert.ok(hot.every(Number.isFinite));assert.ok(Math.max(...hot.map(Math.abs))<1);
 });
 test('stop fades voices quickly and leaves silence',()=>{
  const l=new OrbitLayer(SR);l.setScale(defs[0].scale);l.setSound('velvet');l.noteOn(60,.23,1.4);for(let i=0;i<4000;i++)l.process();assert.ok(l.on[0]);

@@ -6,7 +6,7 @@
   'Timbro':['Timbre','Timbre','Klang','Timbre'],'Nuova frase':['New phrase','Nouvelle phrase','Neue Phrase','Nueva frase'],'Tieni la frase':['Keep phrase','Garder la phrase','Phrase halten','Mantener frase'],
   'Orbit resta nella tonalità del brano e segue gli accordi del basso.':['Orbit stays in the song key and follows the bass chords.','Orbit reste dans la tonalité du morceau et suit les accords de la basse.','Orbit bleibt in der Tonart des Songs und folgt den Bassakkorden.','Orbit se mantiene en la tonalidad y sigue los acordes del bajo.'],
   'Mixer':['Mixer','Mixeur','Mixer','Mezclador'],'Tempo':['Tempo','Tempo','Tempo','Tempo'],'Risonanza':['Resonance','Résonance','Resonanz','Resonancia'],'Esplora':['Explore','Explorer','Erkunden','Explorar'],'Luminosità':['Brightness','Luminosité','Helligkeit','Brillo'],'Riverbero':['Reverb','Réverb','Hall','Reverb'],
-  'Basso':['Bass','Basse','Bass','Bajo'],'Cassa':['Kick','Kick','Kick','Bombo'],'Rullante':['Snare','Caisse claire','Snare','Caja'],'Generale':['Master','Général','Gesamt','General'],'Muto':['Mute','Muet','Stumm','Silencio'],'Distorsione':['Distortion','Distorsion','Verzerrung','Distorsión'],'Tonalità':['Key','Tonalité','Tonart','Tono'],'Ottava':['Octave','Octave','Oktave','Octava'],'Ripeti sezione':['Loop section','Boucler la section','Abschnitt loopen','Repetir sección'],'Tastiera: Spazio play · 1-7 muto · Maiusc+1-7 solo · ← → sezione · L ripeti · B ritmo · N frase · G stutter':['Keys: Space play · 1-7 mute · Shift+1-7 solo · ← → section · L loop · B beat · N phrase · G stutter','Touches : Espace lecture · 1-7 muet · Maj+1-7 solo · ← → section · L boucle · B rythme · N phrase · G stutter','Tasten: Leertaste Play · 1-7 Stumm · Umschalt+1-7 Solo · ← → Abschnitt · L Loop · B Beat · N Phrase · G Stutter','Teclas: Espacio play · 1-7 silencio · Mayús+1-7 solo · ← → sección · L repetir · B ritmo · N frase · G stutter'],'Togli muti e solo':['Clear mute and solo','Retirer muet et solo','Mute und Solo aufheben','Quitar silencio y solo'],
+  'Basso':['Bass','Basse','Bass','Bajo'],'Cassa':['Kick','Kick','Kick','Bombo'],'Rullante':['Snare','Caisse claire','Snare','Caja'],'Generale':['Master','Général','Gesamt','General'],'Muto':['Mute','Muet','Stumm','Silencio'],'Sessione dal link':['Session from link','Session du lien','Session aus Link','Sesión del enlace'],'Sessione caricata dal link':['Session loaded from link','Session chargée depuis le lien','Session aus Link geladen','Sesión cargada desde el enlace'],'Link non valido':['Invalid link','Lien non valide','Ungültiger Link','Enlace no válido'],'Distorsione':['Distortion','Distorsion','Verzerrung','Distorsión'],'Tonalità':['Key','Tonalité','Tonart','Tono'],'Ottava':['Octave','Octave','Oktave','Octava'],'Ripeti sezione':['Loop section','Boucler la section','Abschnitt loopen','Repetir sección'],'Tastiera: Spazio play · 1-7 muto · Maiusc+1-7 solo · ← → sezione · L ripeti · B ritmo · N frase · G stutter':['Keys: Space play · 1-7 mute · Shift+1-7 solo · ← → section · L loop · B beat · N phrase · G stutter','Touches : Espace lecture · 1-7 muet · Maj+1-7 solo · ← → section · L boucle · B rythme · N phrase · G stutter','Tasten: Leertaste Play · 1-7 Stumm · Umschalt+1-7 Solo · ← → Abschnitt · L Loop · B Beat · N Phrase · G Stutter','Teclas: Espacio play · 1-7 silencio · Mayús+1-7 solo · ← → sección · L repetir · B ritmo · N frase · G stutter'],'Togli muti e solo':['Clear mute and solo','Retirer muet et solo','Mute und Solo aufheben','Quitar silencio y solo'],
   'Audio non disponibile':['Audio unavailable','Audio indisponible','Audio nicht verfügbar','Audio no disponible'],'Nuova frase pronta':['New phrase ready','Nouvelle phrase prête','Neue Phrase bereit','Nueva frase lista'],'Frase tenuta':['Phrase kept','Phrase gardée','Phrase gehalten','Frase mantenida'],'La frase evolve a ogni brano':['The phrase changes with each song','La phrase change à chaque morceau','Die Phrase ändert sich mit jedem Song','La frase cambia con cada canción'],'Ritmo: {style}':['Beat: {style}','Rythme : {style}','Beat: {style}','Ritmo: {style}']
  };
  const LANGS=['en','fr','de','es'];
@@ -19,7 +19,7 @@
  const clone=o=>JSON.parse(JSON.stringify(o));
  let songIndex=D.defs.findIndex(d=>d.name==='Coro di Mezzanotte');if(songIndex<0)songIndex=0;
  let state=clone(D.demos[songIndex]),ctx=null,node=null,starting=null,running=false,keep=false,section=-1,pattern=-1;
- const orbit={sound:'glass',amount:35,tone:62,notes:[0,4,2,6,4,7,2,3],seed:1};
+ const orbit={sound:'glass',amount:35,tone:62,drive:0,notes:[0,4,2,6,4,7,2,3],seed:1};
  const mix={lead:75,orbit:55},returns={delay:1,reverb:1},touched=new Set();
  const strips=X.CHANNELS.map(id=>({mute:false,solo:false,pan:0,delay:0,reverb:id==='orbit'?.12:0}));
  const stripIndex=id=>X.CHANNELS.indexOf(id);
@@ -35,6 +35,9 @@
  const songMsg=()=>({tempo:state.tempo,swing:state.swing,patterns:state.patterns,chain:state.chain,song:state.song,transpose:key,scale:D.defs[songIndex].scale.map(pc=>(pc+key+24)%12)});
  const sendSong=()=>send({type:'load',params:state.params,...songMsg()});
  const sendPhrase=()=>send({type:'phrase',deg:timeline.deg,beats:timeline.beats});
+ let part=null;
+ const sendPart=()=>send({type:'part',part});
+ const clearPart=()=>{if(part){part=null;sendPart();}};
  const sendStrip=i=>send({type:'strip',i,...strips[i]});
  const sendReturns=()=>send({type:'returns',...returns});
 
@@ -49,8 +52,8 @@
    n.connect(c.destination);
    n.port.onmessage=({data})=>{if(data.type==='step'){const delay=((c.outputLatency||0)+(c.baseLatency||0))*1000;setTimeout(()=>showStep(data),delay);}else if(data.type==='meters')showMeters(data.peaks);};
    ctx=c;node=n;
-   sendSong();sendPhrase();
-   send({type:'sound',id:orbit.sound});send({type:'tone',value:orbit.tone/100});strips.forEach((_,i)=>sendStrip(i));sendReturns();send({type:'orbit',value:mix.orbit/100});send({type:'lead',value:mix.lead/75});send({type:'octave',value:+$('octave').value});send({type:'loop',on:looping});if(queuedSection>=0)send({type:'section',i:queuedSection});
+   sendSong();sendPhrase();sendPart();
+   send({type:'sound',id:orbit.sound});send({type:'tone',value:orbit.tone/100});send({type:'orbitDrive',value:orbit.drive/100});strips.forEach((_,i)=>sendStrip(i));sendReturns();send({type:'orbit',value:mix.orbit/100});send({type:'lead',value:mix.lead/75});send({type:'octave',value:+$('octave').value});send({type:'loop',on:looping});if(queuedSection>=0)send({type:'section',i:queuedSection});
    if(c.state!=='running')await c.resume();
   })();
   try{await starting;}catch(err){ctx=null;node=null;status('Audio non disponibile');throw err;}finally{starting=null;}
@@ -116,7 +119,8 @@
   for(const c of [param('cutoff','Cutoff'),param('resonance','Risonanza'),param('envMod','Env Mod'),param('decay','Decay'),param('accent','Accent'),param('drive','Drive'),param('distortion','Distorsione'),param('crush','Crush'),param('glitch','Glitch'),param('fill','Fill')])slider($('acido-controls'),c);
   for(const c of [
    {id:'amount',label:'Esplora',get:()=>orbit.amount,set:v=>{orbit.amount=v;if(!keep)newPhrase(false);}},
-   {id:'tone',label:'Luminosità',get:()=>orbit.tone,set:v=>{orbit.tone=v;send({type:'tone',value:v/100});}}
+   {id:'tone',label:'Luminosità',get:()=>orbit.tone,set:v=>{orbit.tone=v;send({type:'tone',value:v/100});}},
+   {id:'orbitDrive',label:'Distorsione',get:()=>orbit.drive,set:v=>{orbit.drive=v;send({type:'orbitDrive',value:v/100});}}
   ])slider($('orbit-controls'),c);
   buildMixer();
  }
@@ -164,11 +168,38 @@
   });
  }
  function newPhrase(announce=true){
+  clearPart();
   orbit.seed=Math.floor(Math.random()*2147483647);
   timeline=L.buildTimeline(window.OrbitFlow,{notes:orbit.notes,amount:orbit.amount/100,seed:orbit.seed});
   sendPhrase();if(announce)status('Nuova frase pronta');
  }
+ // Link format: #s=<Acido session>~<optional Orbit part>. The fragment never reaches the server.
+ async function inflate(code){
+  if(code.length>64000)throw new Error('TOO_LONG');
+  const raw=atob(code.replace(/-/g,'+').replace(/_/g,'/')),bytes=Uint8Array.from(raw,c=>c.charCodeAt(0));
+  const reader=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('deflate-raw')).getReader(),parts=[];let size=0;
+  for(;;){const {done,value}=await reader.read();if(done)break;size+=value.length;if(size>512000){await reader.cancel();throw new Error('TOO_LONG');}parts.push(value);}
+  return JSON.parse(await new Blob(parts).text());
+ }
+ async function loadLink(){
+  const m=location.hash.match(/^#s=([\w-]+)(?:~([\w-]+))?$/);if(!m)return;
+  history.replaceState(null,'',location.pathname+location.search);
+  try{
+   const next=await window.AcidoTools.decodeState(m[1]),data=m[2]?await inflate(m[2]):null,nextPart=data?L.buildPart(next,data):null,o=data?.m||{};
+   const unit=(v,fallback)=>Number.isFinite(v)?Math.min(1,Math.max(0,v)):fallback,pan=(v,fallback)=>Number.isFinite(v)?Math.min(1,Math.max(-1,v)):fallback;
+   state=next;part=nextPart;section=-1;pattern=-1;queuedSection=-1;songSends();
+   if(L.SOUNDS.includes(o.sound)){orbit.sound=o.sound;$('sound').value=o.sound;}
+   orbit.tone=unit(o.tone,orbit.tone/100)*100;orbit.drive=unit(o.drive,0)*100;mix.orbit=unit(o.level,mix.orbit/100)*100;
+   strips[stripIndex('orbit')].pan=pan(o.orbitPan,0);strips[stripIndex('lead')].pan=pan(o.leadPan,0);strips[stripIndex('orbit')].reverb=unit(o.orbitReverb,.12);
+   keep=true;$('keep').setAttribute('aria-pressed','true');$('tempo').value=state.tempo;
+   const item=new Option(t('Sessione dal link'),-1,true,true);$('song').add(item,0);
+   buildSections();for(const x of sliders)x.paint();
+   status('Sessione caricata dal link');
+  }catch{status('Link non valido');}
+ }
  function loadSong(i){
+  if(i<0)return;
+  clearPart();$('song').querySelector('option[value="-1"]')?.remove();
   songIndex=i;const old=state.params,keepMix={};
   for(const id of ['bass','kick','snare','hat','clap','duck','volume'])keepMix[id]=old[id];
   state=clone(D.demos[i]);Object.assign(state.params,keepMix);
@@ -228,6 +259,7 @@
   document.addEventListener('keyup',e=>{if(e.key.toLowerCase()==='g')setStutter(false);});
   const saved=store.get(),browser=(navigator.language||'en').slice(0,2);
   applyLanguage(saved||browser);
+  loadLink();
  }
  init();
 })();

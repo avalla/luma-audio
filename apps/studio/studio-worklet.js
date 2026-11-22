@@ -18,7 +18,7 @@ class StudioProcessor extends AudioWorkletProcessor{
   this.seq=new globalThis.AcidoSequencer.Sequencer(sampleRate);
   this.layer=new globalThis.LumaOrbitLayer.OrbitLayer(sampleRate);
   this.mixer=new globalThis.LumaMixer.Mixer(sampleRate);
-  this.engine.sequence=this.seq;this.engine.layer=this.layer;this.engine.mixer=this.mixer;
+  this.engine.sequence=this.seq;this.engine.layer=this.layer;this.engine.mixer=this.mixer;this.layer.clock=this.seq;
   this.meterAt=0;this.meterLive=false;this.meterMsg={type:'meters',peaks:this.mixer.peak};
   this.stepMsg={type:'step',step:-1,pattern:0,section:-1};
   this.port.onmessage=({data:m})=>{
@@ -38,8 +38,10 @@ class StudioProcessor extends AudioWorkletProcessor{
     case 'stutter':this.engine.stutter(m.on===true);break;
     case 'octave':this.layer.octave=Math.min(1,Math.max(-1,m.value|0));break;
     case 'phrase':this.layer.setPhrase(m.deg,m.beats);break;
+    case 'part':this.layer.setPart(m.part);break;
     case 'sound':this.layer.setSound(m.id);break;
     case 'tone':this.layer.setTone(m.value);break;
+    case 'orbitDrive':this.layer.setDrive(m.value);break;
     case 'strip':this.mixer.setStrip(m.i,m);break;
     case 'returns':this.mixer.setReturns(m.delay,m.reverb);break;
     case 'orbit':this.layer.level=m.value;break;
