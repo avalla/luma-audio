@@ -22,7 +22,7 @@ function song(d, i) {
 const text = `${JSON.stringify({ version: 1, songs: demos.map(song) })}\n`;
 const file = path.join(__dirname, '../plugins/acido-core/demos.json');
 if (process.argv.includes('--check')) {
- if (fs.readFileSync(file, 'utf8') !== text) { console.error('plugins/acido-core/demos.json is stale: run bun scripts/generate_acido_demos.cjs'); process.exit(1); }
+ if (fs.readFileSync(file, 'utf8').replace(/\r\n/g, '\n') !== text) { /* Windows checkouts may use CRLF */ console.error('plugins/acido-core/demos.json is stale: run bun scripts/generate_acido_demos.cjs'); process.exit(1); }
  console.log('demos.json is current');
 } else {
  fs.writeFileSync(file, text);
