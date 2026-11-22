@@ -32,7 +32,7 @@ Aprire <http://127.0.0.1:8767> e premere **Play**. Serve AudioWorklet (localhost
 
 Sequencer: clic su una cella per scrivere la nota, clic di nuovo per la pausa. Righe **Ott** (·/UP/DN), **Gate** (· normale 50%, **C** corta 22%, **L** lunga 92% del passo), **Acc**, **Slide**. Uno slide sul passo N tiene il gate fino al passo N+1 e scivola sulla sua altezza (~60 ms) senza riattaccare gli inviluppi. **Casuale** genera un pattern in minore o frigio, ◀ ▶ ruotano il pattern, **Passi** accorcia il giro. Cinque preset di fabbrica ("Squelch classico" ha i pattern A e B e swing 56%, "Pedale acido" usa la distorsione, "Glitch rotto" crush, glitch e fuzz); lo stato si salva automaticamente nel browser e quello della versione precedente diventa il pattern A.
 
-**Pattern A–H** (anche tasti `1`–`8`): il pattern selezionato è quello che modifichi. A sequencer fermo diventa anche quello che parte; in play viene messo in coda (pallino lampeggiante) e parte alla fine del giro corrente. Il pallino fisso indica il pattern in riproduzione; il cursore del passo appare solo se stai guardando quel pattern. Ogni pattern ha la sua lunghezza. **Copia/Incolla** duplicano un pattern per farne varianti.
+**Pattern A–H** (anche tasti `1`–`8`): il pattern selezionato è quello che modifichi. A sequencer fermo diventa anche quello che parte; in play viene messo in coda (pallino lampeggiante) e parte alla fine del giro corrente. Il pallino fisso indica il pattern in riproduzione; con **Segui** attivo la griglia resta sempre sul pattern che suona. Ogni pattern ha la sua lunghezza. **Copia/Incolla** duplicano un pattern per farne varianti.
 
 **Catena**: scrivi l'ordine, per esempio `A A B A` (fino a 32 voci). Il Play parte dalla prima voce e la catena si ripete; scegliere un pattern mentre suona salta a quella voce a fine giro e la catena prosegue da lì. Vuota = ripete il pattern scelto. Uno slide sull'ultimo passo scivola nel primo passo del pattern successivo.
 
@@ -44,7 +44,10 @@ Tastiera: `A W S E D F T G Y H U J K` = un'ottava, legato = slide, `Shift` = acc
 
 - **Automazione:** con Rec attivo e il sequencer in play, i movimenti di Cutoff, Reso, Env Mod e Decay vengono scritti passo per passo nel pattern. La riga Auto mostra il parametro scelto: si disegna col mouse, doppio clic o Canc cancella un passo, Cancella svuota la corsia. Un passo vuoto segue il pomello.
 - **Filtro a formanti:** Formant regola il mix e Vocale sceglie A E I O U. La riga Voc assegna una vocale a ogni passo, con un passaggio morbido tra una e l'altra.
-- **Percussioni:** righe Hat (`CH` chiuso, `OH` aperto) e Clap, con i volumi nel gruppo Percussioni.
+- **Percussioni:** righe Snare (`X` pieno, `g` ghost), Hat (`CH` chiuso, `OH` aperto) e Clap, con i volumi nel gruppo Percussioni.
+- **Batteria casuale:** scegli Techno, Rave, Breakbeat, Jungle o Electro e genera il ritmo del pattern. **Su tutti i pattern** lo applica all'intero brano con piccole variazioni; i break senza batteria restano muti.
+- **Fill:** rullate automatiche a fine frase. Più alto è il valore, più sono frequenti e lunghe; a 0 la batteria resta esattamente come programmata.
+- **Segui:** la griglia mostra il pattern in riproduzione lungo tutto il brano. Scegliere un altro pattern mentre suona un brano disattiva Segui, così puoi modificarlo.
 - **Riverbero:** Reverb e Room, su basso e clap. Cassa e hi-hat restano asciutti.
 - **Annulla:** pulsanti Annulla e Ripristina, oppure `Cmd/Ctrl+Z` e `Shift+Cmd/Ctrl+Z`. La cronologia dura finché la pagina resta aperta.
 - **Esporta WAV:** stereo, 24 bit, 48 kHz, con il numero di giri scelto più 2 secondi di coda (massimo 10 minuti). Viene calcolato in un worker con lo stesso motore del suono dal vivo.
@@ -88,7 +91,7 @@ Online su <https://acido.avalla.dev> (Cloudflare Workers, solo asset statici). C
 bun run deploy:acido
 ```
 
-Lo staging copia in `build/acido-web` solo i diciannove file pubblici (niente test né README). L'autenticazione resta nella configurazione locale di Wrangler.
+Lo staging copia in `build/acido-web` solo i venti file pubblici (niente test né README). L'autenticazione resta nella configurazione locale di Wrangler.
 
 ## Prossimi passi
 

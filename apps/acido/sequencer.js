@@ -5,6 +5,7 @@
 (function(root){
  const BASE_NOTE=36;
  const AUTO=(typeof module!=='undefined'&&module.exports?require('./session.js'):root.AcidoSession).AUTO_PARAMS;
+ const Beats=typeof module!=='undefined'&&module.exports?require('./beats.js'):root.AcidoBeats;
  const GATES=[.5,.22,.92]; // per-step gate: normale, corta, lunga (fraction of the step)
  class Sequencer{
   constructor(sr){
@@ -107,11 +108,18 @@
    this.curLen=this.stepLen*2*(this.count%2===0?this.swing:1-this.swing);
    if(engine.onStep)engine.onStep(this.curLen);
    // Default kick: every beat, counted from Play so it stays straight with odd pattern lengths. A programmed pattern overrides it.
-   const kick=p&&Array.isArray(p.kicks)?p.kicks[this.step]===true:this.count%4===0;
+   // Fills follow the absolute bar, so they land at the end of the phrase with any pattern length.
+   const pos=this.count%16;let fi=Beats.fillIndex(Math.floor(this.count/16),engine.target?engine.target.fill:0,pos);
+   if(fi>=0&&!Beats.hasDrums(p))fi=-1;
+   const F=fi>=0?Beats.FILLS[fi]:null;
+   const kick=F?F.k[pos]===1:p&&Array.isArray(p.kicks)?p.kicks[this.step]===true:this.count%4===0;
    if(kick&&!(m&&m.kick)&&engine.kickHit)engine.kickHit();
    this.count++;
    this.applyAuto(engine,this.pat,this.step); // before noteOn, which reads the decay
-   if(s&&engine.drumHit)engine.drumHit(m&&m.hat?0:s.hat,m&&m.clap?false:s.clap);
+   if(s&&engine.drumHit){
+    const hat=F?F.h[pos]:s.hat,clap=F?false:s.clap,snare=F?F.s[pos]:s.snare||0;
+    engine.drumHit(m&&m.hat?0:hat,m&&m.clap?false:clap,m&&m.snare?0:snare);
+   }
    if(engine.bassOn){
     if(s&&s.bass>=0&&!(m&&m.bass)){
      engine.bassOn(BASE_NOTE+(s.bassOct||0)*12+s.bass+this.transpose,this.prevBassTie);

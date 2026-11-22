@@ -16,9 +16,9 @@
   redo(current){if(!this.future.length)return null;this.past.push(current);this.lastTag=null;return this.future.pop();}
  }
  const round=v=>Math.round(v*1e4)/1e4;
- const packStep=s=>[s.note,+s.gate,+s.accent,+s.slide,s.octave,s.gateLen,s.hat,+s.clap,s.vowel,s.bass,s.bassOct,+s.bassTie];
- const unpackStep=a=>Array.isArray(a)?{note:a[0],gate:a[1]===1,accent:a[2]===1,slide:a[3]===1,octave:a[4],gateLen:a[5],hat:a[6],clap:a[7]===1,vowel:a[8],bass:a[9],bassOct:a[10],bassTie:a[11]===1}:null;
- const isEmpty=p=>!Object.keys(p.auto).length&&!p.kicks&&p.length===S.STEPS&&p.steps.every(s=>!s.gate&&!s.hat&&!s.clap&&s.vowel<0&&s.bass<0);
+ const packStep=s=>[s.note,+s.gate,+s.accent,+s.slide,s.octave,s.gateLen,s.hat,+s.clap,s.vowel,s.bass,s.bassOct,+s.bassTie,s.snare];
+ const unpackStep=a=>Array.isArray(a)?{note:a[0],gate:a[1]===1,accent:a[2]===1,slide:a[3]===1,octave:a[4],gateLen:a[5],hat:a[6],clap:a[7]===1,vowel:a[8],bass:a[9],bassOct:a[10],bassTie:a[11]===1,snare:a[12]}:null;
+ const isEmpty=p=>!Object.keys(p.auto).length&&!p.kicks&&p.length===S.STEPS&&p.steps.every(s=>!s.gate&&!s.hat&&!s.clap&&!s.snare&&s.vowel<0&&s.bass<0);
  function pack(state){
   let last=state.patterns.length;while(last>1&&isEmpty(state.patterns[last-1]))last--; // trailing empty patterns are implicit
   return {v:2,g:state.song,n:state.name,p:Object.fromEntries(Object.entries(state.params).map(([k,v])=>[k,round(v)])),t:state.tempo,w:state.swing,c:state.current,h:state.chain,

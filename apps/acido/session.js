@@ -27,6 +27,8 @@
   {id:'reverbSize',label:'Room',value:.5,format:pct},
   {id:'hat',label:'Hat',value:.55,format:v=>v<1e-3?'off':pct(v)},
   {id:'clap',label:'Clap',value:.5,format:v=>v<1e-3?'off':pct(v)},
+  {id:'snare',label:'Snare',value:.6,format:v=>v<1e-3?'off':pct(v)},
+  {id:'fill',label:'Fill',value:0,format:v=>v<1e-3?'off':pct(v)},
   {id:'bass',label:'Bass',value:.65,format:v=>v<1e-3?'off':pct(v)},
   {id:'bassTone',label:'Tone',value:.3,format:v=>`${Math.round(80*Math.pow(2,v*5))} Hz`},
   {id:'bassDecay',label:'Decay',value:.45,format:v=>`${Math.round((.15+v*1.85)*1000)} ms`}
@@ -47,9 +49,9 @@
  const LETTERS='ABCDEFGH';
  // Bank 1 keeps the historic names A..H; the others are A2..H4.
  const PATTERN_NAMES=Array.from({length:PATTERNS},(_,i)=>LETTERS[i%BANK]+(i<BANK?'':Math.floor(i/BANK)+1));
- const MUTES=['lead','bass','kick','hat','clap'];
+ const MUTES=['lead','bass','kick','hat','clap','snare'];
  const GATE_NAMES=['normale','corta','lunga'];
- const step=(note=0,{gate=true,accent=false,slide=false,octave=0,gateLen=0,hat=0,clap=false,vowel=-1,bass=-1,bassOct=0,bassTie=false}={})=>({note,gate,accent,slide,octave,gateLen,hat,clap,vowel,bass,bassOct,bassTie});
+ const step=(note=0,{gate=true,accent=false,slide=false,octave=0,gateLen=0,hat=0,clap=false,vowel=-1,bass=-1,bassOct=0,bassTie=false,snare=0}={})=>({note,gate,accent,slide,octave,gateLen,hat,clap,vowel,bass,bassOct,bassTie,snare});
  const rest=()=>step(0,{gate:false});
  const emptyPattern=()=>({length:STEPS,steps:Array.from({length:STEPS},rest),auto:{},kicks:null});
 
@@ -63,7 +65,7 @@
   const vowel=Number.isInteger(s.vowel)&&s.vowel>=0&&s.vowel<VOWEL_NAMES.length?s.vowel:-1;
   const bass=Number.isInteger(s.bass)&&s.bass>=0&&s.bass<=12?s.bass:-1;
   const bassOct=[-1,0,1].includes(s.bassOct)?s.bassOct:0;
-  return {note,gate:s.gate===true,accent:s.accent===true,slide:s.slide===true,octave,gateLen,hat,clap:s.clap===true,vowel,bass,bassOct,bassTie:bass>=0&&s.bassTie===true};
+  return {note,gate:s.gate===true,accent:s.accent===true,slide:s.slide===true,octave,gateLen,hat,clap:s.clap===true,vowel,bass,bassOct,bassTie:bass>=0&&s.bassTie===true,snare:[0,1,2].includes(s.snare)?s.snare:0};
  }
  // Automation: one lane per parameter, null = the step follows the knob. Empty lanes are dropped.
  function validAuto(a){
@@ -145,6 +147,7 @@
    if(!x.steps.some(st=>st.gate))continue;
    x.steps.forEach((st,i)=>{st.hat=i%4===2?2:i%2===1?1:0;st.clap=i%8===4;});
   }
+  p.params.fill=.4;
   return p;
  }
  const api={params,defaults,AUTO_PARAMS,VOWEL_NAMES,NOTE_NAMES,DIST_TYPES,STEPS,BANK,BANKS,PATTERNS,PATTERN_NAMES,MUTES,MAX_SECTIONS,MAX_SECTION_PATTERNS,GATE_NAMES,validate,parseChain,formatChain,emptyPattern,randomPattern,cutoffHz,decaySeconds,distToneHz,glitchSlice,presets:presets.map(validate).map(groove),rng};

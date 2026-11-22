@@ -2,7 +2,7 @@
 from pathlib import Path
 import shutil
 
-FILES = ("index.html", "acido.css", "app.js", "i18n.js", "session.js", "engine.js", "glitch.js", "kick.js", "drums.js", "formant.js", "reverb.js", "bass.js", "midi.js", "demos.js", "sequencer.js", "worklet.js", "render.js", "render-worker.js", "tools.js")
+FILES = ("index.html", "acido.css", "app.js", "i18n.js", "session.js", "engine.js", "glitch.js", "kick.js", "drums.js", "formant.js", "reverb.js", "bass.js", "midi.js", "demos.js", "beats.js", "sequencer.js", "worklet.js", "render.js", "render-worker.js", "tools.js")
 
 root = Path(__file__).resolve().parents[1]
 destination = root / "build" / "acido-web"

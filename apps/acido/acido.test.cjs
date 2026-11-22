@@ -237,7 +237,7 @@ test('validation clamps, defaults and roundtrips',()=>{
  assert.equal(v.params.cutoff,1);assert.equal(v.params.resonance,S.defaults.resonance);
  assert.equal(v.tempo,200);assert.equal(v.swing,.75);assert.deepEqual(v.chain,[0,1]);assert.equal(v.current,0);
  assert.equal(v.patterns.length,S.PATTERNS);assert.equal(v.patterns[0].length,16);assert.equal(v.patterns[0].steps.length,16);
- assert.deepEqual(v.patterns[0].steps[0],{note:12,gate:true,accent:false,slide:false,octave:0,gateLen:0,hat:0,clap:false,vowel:-1,bass:-1,bassOct:0,bassTie:false});
+ assert.deepEqual(v.patterns[0].steps[0],{note:12,gate:true,accent:false,slide:false,octave:0,gateLen:0,hat:0,clap:false,vowel:-1,bass:-1,bassOct:0,bassTie:false,snare:0});
  assert.ok(v.patterns[31].steps.every(s=>!s.gate));
  assert.deepEqual(S.validate(JSON.parse(JSON.stringify(v))),v);
  assert.throws(()=>S.validate(null));

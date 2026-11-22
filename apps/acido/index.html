@@ -73,6 +73,13 @@
    <button type="button" id="share">Condividi</button>
    <span class="status" id="status" aria-live="polite"></span>
   </div>
+  <div class="seq-tools">
+   <label class="field">Batteria<select id="beat-style"><option value="techno">Techno</option><option value="rave">Rave</option><option value="breakbeat">Breakbeat</option><option value="jungle">Jungle</option><option value="electro">Electro</option></select></label>
+   <button type="button" id="beat-random">Batteria casuale</button>
+   <button type="button" id="beat-all">Su tutti i pattern</button>
+   <button type="button" id="follow" class="toggle" aria-pressed="true">Segui</button>
+   <span class="now-playing" id="now-playing"></span>
+  </div>
   <div class="roll-wrap">
    <div class="roll" id="roll" role="group" aria-label="Note del pattern"></div>
   </div>
@@ -120,6 +127,7 @@
 <script src="i18n.js"></script>
 <script src="tools.js"></script>
 <script src="midi.js"></script>
+<script src="beats.js"></script>
 <script src="demos.js"></script>
 <script src="app.js"></script>
 </body>

@@ -2,7 +2,7 @@ const test=require('node:test'),assert=require('node:assert/strict');
 const S=require('./session.js'),{Engine}=require('./engine.js'),{Sequencer}=require('./sequencer.js');
 const {Bass}=require('./bass.js'),{renderState,musicFrames}=require('./render.js'),T=require('./tools.js'),M=require('./midi.js');
 const SR=48000,peak=a=>a.reduce((m,x)=>Math.max(m,Math.abs(x)),0);
-const NONE={lead:false,bass:false,kick:false,hat:false,clap:false};
+const NONE={lead:false,bass:false,kick:false,hat:false,clap:false,snare:false};
 function stub(){const e={log:[],kicks:[],bass:[],noteOn(n,a,sl){e.log.push({n,sl});},noteOff(){},kickHit(){e.kicks.push(q.count);},drumHit(h,c){if(h||c)e.drums=(e.drums||0)+1;},bassOn(n,t){e.bass.push({n,t,at:q.count-1});},bassOff(){e.bassOffs=(e.bassOffs||0)+1;}};let q=null;e.bind=x=>{q=x;};return e;}
 function seq(state){const q=new Sequencer(SR),e=stub();e.bind(q);q.configure(JSON.parse(JSON.stringify(state)));return {q,e};}
 const runSteps=(q,e,n)=>{while(q.count<n)q.tick(e);};

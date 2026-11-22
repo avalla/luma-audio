@@ -6,6 +6,7 @@ import './formant.js';
 import './reverb.js';
 import './bass.js';
 import './engine.js';
+import './beats.js';
 import './sequencer.js';
 class AcidoProcessor extends AudioWorkletProcessor{
  constructor(){

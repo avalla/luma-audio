@@ -1,6 +1,7 @@
 /* Synthesized hi-hat and clap. DOM-free, allocation-free per sample, deterministic.
    Hat: six detuned squares plus noise through two high-pass stages; a closed hit chokes the open one.
-   Clap: band-passed noise with three quick bursts and a short tail. */
+   Clap: band-passed noise with three quick bursts and a short tail.
+   Snare: two detuned body tones plus high-passed noise; a ghost hit is the same sound, quieter. */
 (function(root){
  const TAU=Math.PI*2;
  const METAL=[205.3,304.4,369.6,522.7,540,800];
@@ -14,17 +15,20 @@
    this.b2=Math.round(.011*sr);this.b3=Math.round(.022*sr);this.b4=Math.round(.033*sr);
    this.bpG=Math.tan(Math.PI*1300/sr);this.bpK=1/1.6;
    this.bpA1=1/(1+this.bpG*(this.bpG+this.bpK));this.bpA2=this.bpG*this.bpA1;this.bpA3=this.bpG*this.bpA2;
+   this.snBodyCoef=Math.exp(-6.9/(.09*sr));this.snNoiseCoef=Math.exp(-6.9/(.17*sr));this.snHp=1-Math.exp(-TAU*1800/sr);this.snInc1=185/sr;this.snInc2=330/sr;
    this.reset();
   }
   reset(){
    this.ph.fill(0);this.hatEnv=0;this.hatCoef=this.closedCoef;this.lp1=this.lp2=0;
    this.burst=0;this.tail=0;this.clapT=-1;this.ic1=this.ic2=0;this.noise=0x51ed;this.hatOut=0;this.clapOut=0;
+   this.snEnv=0;this.snBody=0;this.snPh1=0;this.snPh2=0;this.snLp=0;this.snLevel=1;this.snareOut=0;
   }
   hat(open){this.hatEnv=1;this.hatCoef=open?this.openCoef:this.closedCoef;}
   clap(){this.clapT=0;this.burst=1;this.tail=0;}
+  snare(level){this.snEnv=1;this.snBody=1;this.snLevel=level;}
   process(){
-   this.hatOut=0;this.clapOut=0;
-   if(this.hatEnv<1e-5&&this.clapT<0&&this.burst<1e-5&&this.tail<1e-5)return;
+   this.hatOut=0;this.clapOut=0;this.snareOut=0;
+   if(this.hatEnv<1e-5&&this.clapT<0&&this.burst<1e-5&&this.tail<1e-5&&this.snEnv<1e-5)return;
    this.noise=Math.imul(this.noise,1664525)+1013904223|0;
    const n=this.noise/2147483648;
    if(this.hatEnv>=1e-5){
@@ -48,6 +52,12 @@
     this.clapOut=v1*this.bpK*env*2.2;
    }
    this.burst*=this.burstCoef;this.tail*=this.tailCoef;
+   if(this.snEnv>=1e-5){
+    let a=this.snPh1+this.snInc1,b=this.snPh2+this.snInc2;if(a>=1)a-=1;if(b>=1)b-=1;this.snPh1=a;this.snPh2=b;
+    this.snLp+=(n-this.snLp)*this.snHp;
+    this.snareOut=((Math.sin(TAU*a)*.6+Math.sin(TAU*b)*.4)*this.snBody*.6+(n-this.snLp)*this.snEnv*.8)*this.snLevel;
+    this.snBody*=this.snBodyCoef;this.snEnv*=this.snNoiseCoef;
+   }
   }
  }
  const api={Drums};

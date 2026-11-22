@@ -1,5 +1,5 @@
 /* Renders the WAV off the main thread so the interface and live audio keep running. */
-importScripts('session.js','glitch.js','kick.js','drums.js','formant.js','reverb.js','bass.js','engine.js','sequencer.js','render.js');
+importScripts('session.js','glitch.js','kick.js','drums.js','formant.js','reverb.js','bass.js','engine.js','beats.js','sequencer.js','render.js');
 self.onmessage=({data})=>{
  try{
   const state=self.AcidoSession.validate(data.state);

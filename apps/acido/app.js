@@ -10,7 +10,8 @@
  const T=window.AcidoTools,undoStack=new T.History(),touched=new Set();
  let rec=false,autoLane='cutoff',exportWorker=null;
  const M=window.AcidoMidi;
- let viewBank=0,editBass=false,playSection=-1,midi=null,midiResult=null,userPresets=[];
+ let viewBank=0,editBass=false,playSection=-1,midi=null,midiResult=null,userPresets=[],follow=true;
+ const B=window.AcidoBeats;
 
  // ---- Undo ----
  function mark(tag){undoStack.mark(()=>JSON.stringify(state),tag,performance.now());renderHistory();}
@@ -51,7 +52,7 @@
  const knobs={};
  function buildKnobs(){
   const host=$('knobs');
-  const groups=[['Voce',['tuning','cutoff','resonance','envMod','decay','accent']],['Distorsione',['drive','distortion','distTone']],['Glitch',['crush','glitch','glitchSize']],['Basso',['bass','bassTone','bassDecay']],['Formanti',['formant','vowel']],['Cassa',['kick','kickTune','kickDecay','duck']],['Percussioni',['hat','clap']],['Uscita',['delay','reverb','reverbSize','volume']]];
+  const groups=[['Voce',['tuning','cutoff','resonance','envMod','decay','accent']],['Distorsione',['drive','distortion','distTone']],['Glitch',['crush','glitch','glitchSize']],['Basso',['bass','bassTone','bassDecay']],['Formanti',['formant','vowel']],['Cassa',['kick','kickTune','kickDecay','duck']],['Percussioni',['snare','hat','clap','fill']],['Uscita',['delay','reverb','reverbSize','volume']]];
   for(const [title,ids] of groups){
    const g=document.createElement('div');g.className='knob-group';g.setAttribute('role','group');I.attr(g,'aria-label',title);
    const cap=document.createElement('span');cap.className='group-title';I.text(cap,title);cap.setAttribute('aria-hidden','true');g.appendChild(cap);
@@ -126,6 +127,8 @@
   }
  }
  function selectPattern(i){
+  // In a song the sections decide what plays: picking another pattern means you want to edit it.
+  if(running&&state.song.on&&i!==playPat)setFollow(false);
   state.current=i;viewBank=Math.floor(i/S.BANK);
   send({type:'select',index:i});
   if(running&&i!==playPat&&!state.song.on)queuedPat=i;else queuedPat=-1;
@@ -149,7 +152,7 @@
  }
 
  // ---- Sequencer roll ----
- const cells=[],octCells=[],gateCells=[],accCells=[],slideCells=[],kickCells=[],hatCells=[],clapCells=[],vowelCells=[],autoCells=[],heads=[];
+ const cells=[],octCells=[],gateCells=[],accCells=[],slideCells=[],kickCells=[],snareCells=[],hatCells=[],clapCells=[],vowelCells=[],autoCells=[],heads=[];
  const GATE_LABELS=['·','C','L'];
  function buildRoll(){
   const roll=$('roll');
@@ -177,6 +180,7 @@
    if(s.vowel>=0&&state.params.formant<.01){state.params.formant=.7;send({type:'param',id:'formant',value:.7});renderParam('formant');}
   }));
   row('Kick',kickCells,'kick',toggleKick);
+  row('Snare',snareCells,'snare',i=>edit(i,s=>{s.snare=(s.snare+1)%3;}));
   row('Hat',hatCells,'hat',i=>edit(i,s=>{s.hat=(s.hat+1)%3;}));
   row('Clap',clapCells,'clap',i=>edit(i,s=>{s.clap=!s.clap;}));
   I.text(add('roll-label row-name'),'Auto');
@@ -244,10 +248,11 @@
    const g=gateCells[i];g.textContent=tr(GATE_LABELS[s.gateLen]);g.classList.toggle('on',s.gateLen!==0);g.setAttribute('aria-label',`${stepName}, ${tr(`gate ${S.GATE_NAMES[s.gateLen]}`)}`);
    for(const [list,flag,name] of [[accCells,s.accent,'accent'],[slideCells,editBass?s.bassTie:s.slide,'slide']]){list[i].classList.toggle('on',flag);list[i].setAttribute('aria-pressed',String(flag));list[i].setAttribute('aria-label',`${stepName}, ${name}`);}
    const kickOn=p.kicks?p.kicks[i]:i%4===0,kc=kickCells[i];kc.classList.toggle('on',kickOn);kc.classList.toggle('auto',!p.kicks);kc.setAttribute('aria-pressed',String(kickOn));kc.setAttribute('aria-label',`${stepName}, kick`);
+   const sn=snareCells[i];sn.textContent=['·','X','g'][s.snare];sn.classList.toggle('on',s.snare!==0);sn.setAttribute('aria-label',`${stepName}, snare ${['off','full','ghost'][s.snare]}`);
    const h=hatCells[i];h.textContent=['·','CH','OH'][s.hat];h.classList.toggle('on',s.hat!==0);h.setAttribute('aria-label',`${stepName}, hat ${['off','closed','open'][s.hat]}`);
    const c=clapCells[i];c.classList.toggle('on',s.clap);c.setAttribute('aria-pressed',String(s.clap));c.setAttribute('aria-label',`${stepName}, clap`);
    const w=vowelCells[i];w.textContent=s.vowel>=0?S.VOWEL_NAMES[s.vowel]:'·';w.classList.toggle('on',s.vowel>=0);w.setAttribute('aria-label',`${stepName}, ${tr('vocale')} ${s.vowel>=0?S.VOWEL_NAMES[s.vowel]:tr('dal pomello')}`);
-   for(const el of [o,g,accCells[i],slideCells[i],kc,h,c,w,heads[i]])el.classList.toggle('out',out);
+   for(const el of [o,g,accCells[i],slideCells[i],kc,sn,h,c,w,heads[i]])el.classList.toggle('out',out);
   }
   renderLane();
  }
@@ -260,9 +265,16 @@
    ledStep=step;playPat=pattern;
    // A message sent before the worklet saw our selection reports no queue: keep ours until that pattern starts.
    if(queued>=0||pattern===queuedPat||queuedPat<0)queuedPat=queued;
+   // Follow: the grid shows what is playing, unless a queued pattern is about to start.
+   if(follow&&pattern>=0&&pattern!==state.current&&queuedPat<0){state.current=pattern;viewBank=Math.floor(pattern/S.BANK);renderRoll();}
    if(rec&&step>=0)for(const id of touched){mark(`p:${id}`);writeAuto(pattern,step,id,state.params[id]);}
   }
-  showLed();renderPatterns();
+  renderNow();showLed();renderPatterns();
+ }
+ function setFollow(on){follow=on;$('follow').setAttribute('aria-pressed',String(on));}
+ function renderNow(){
+  const name=running&&playPat>=0?S.PATTERN_NAMES[playPat]:'',sec=running&&playSection>=0?state.song.sections[playSection]?.name:'',text=[sec,name].filter(Boolean).join(' · ');
+  if($('now-playing').textContent!==text)$('now-playing').textContent=text;
  }
  function showLed(){
   const cur=running&&playPat===state.current?ledStep:-1;
@@ -374,7 +386,7 @@
  }
 
  // ---- Song: sections of patterns with repeats and part mutes ----
- const MUTE_LABELS={lead:'Lead',bass:'Bass',kick:'Kick',hat:'Hat',clap:'Clap'};
+ const MUTE_LABELS={lead:'Lead',bass:'Bass',kick:'Kick',hat:'Hat',clap:'Clap',snare:'Snare'};
  function songChanged(rebuild=true){if(rebuild)renderSong();sendPattern();save();}
  function markSection(){document.querySelectorAll('.song-row').forEach((r,i)=>r.classList.toggle('now',i===playSection));}
  function renderSong(){
@@ -519,7 +531,16 @@
   $('swing').addEventListener('change',e=>{mark();const v=Math.round(Math.min(75,Math.max(50,+e.target.value||50)));e.target.value=v;state.swing=v/100;sendPattern();save();});
   $('chain').addEventListener('change',e=>{mark();state.chain=S.parseChain(e.target.value);e.target.value=S.formatChain(state.chain);sendPattern();save();status(state.chain.length?'Catena: {count} pattern':'Catena vuota: ripete il pattern scelto',{count:state.chain.length});});
   $('length').addEventListener('change',e=>{mark();pat().length=Math.round(Math.min(16,Math.max(1,+e.target.value||16)));e.target.value=pat().length;changed();});
-  $('random').addEventListener('click',()=>{mark();const old=pat().steps;pat().steps=S.randomPattern(Date.now()%2147483647,Math.random()<.5?'minor':'phrygian').map((s,i)=>({...s,hat:old[i].hat,clap:old[i].clap,vowel:old[i].vowel,bass:old[i].bass,bassOct:old[i].bassOct,bassTie:old[i].bassTie}));changed();});
+  $('random').addEventListener('click',()=>{mark();const old=pat().steps;pat().steps=S.randomPattern(Date.now()%2147483647,Math.random()<.5?'minor':'phrygian').map((s,i)=>({...s,hat:old[i].hat,clap:old[i].clap,snare:old[i].snare,vowel:old[i].vowel,bass:old[i].bass,bassOct:old[i].bassOct,bassTie:old[i].bassTie}));changed();});
+  const seedNow=()=>Math.floor(Math.random()*2147483647),styleName=s=>tr(s[0].toUpperCase()+s.slice(1));
+  $('beat-random').addEventListener('click',()=>{mark();const style=$('beat-style').value;B.applyDrums(pat(),B.generate(style,seedNow()));changed();status('Batteria: {style}',{style:styleName(style)});});
+  // Patterns without drums are breaks: they stay silent.
+  $('beat-all').addEventListener('click',()=>{
+   mark();const style=$('beat-style').value,seed=seedNow(),list=state.patterns.filter(p=>patUsed(p)&&B.hasDrums(p));
+   list.forEach((p,i)=>B.applyDrums(p,B.generate(style,seed,i%4)));changed();
+   status('Batteria su {count} pattern: {style}',{count:list.length,style:styleName(style)});
+  });
+  $('follow').addEventListener('click',()=>{setFollow(!follow);if(follow&&running&&playPat>=0&&playPat!==state.current){state.current=playPat;viewBank=Math.floor(playPat/S.BANK);renderRoll();renderPatterns();showLed();}});
   $('clear').addEventListener('click',()=>{mark();pat().steps=S.emptyPattern().steps;pat().auto={};pat().kicks=null;changed();});
   $('undo').addEventListener('click',()=>stepHistory(-1));$('redo').addEventListener('click',()=>stepHistory(1));
   $('rec').addEventListener('click',()=>{rec=!rec;$('rec').setAttribute('aria-pressed',String(rec));status(rec?'Rec: muovi Cutoff, Reso, Env Mod o Decay in play':'');});

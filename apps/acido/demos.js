@@ -49,7 +49,7 @@
  const section=(name,patterns,repeat,...muted)=>({name,patterns,repeat,mute:Object.fromEntries(S.MUTES.map(id=>[id,muted.includes(id)]))});
  const range=(a,n)=>Array.from({length:n},(_,i)=>a+i);
  function song({name,tempo,swing=.5,params,roots,style,leadA,leadB,hats='..o.c.o.c.o.c.o.',claps='....x.......x...',kicks=null,vowels=null,short=false}){
-  const base={...S.defaults,...params},patterns=Array.from({length:S.PATTERNS},()=>S.emptyPattern());
+  const base={...S.defaults,fill:.55,...params},patterns=Array.from({length:S.PATTERNS},()=>S.emptyPattern());
   const voc=j=>Array.isArray(vowels)?vowels[j%vowels.length]:vowels; // one syllable line per bar
   const groove={style,hats,claps,kicks,short};
   for(let i=0;i<4;i++){

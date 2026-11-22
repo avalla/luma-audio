@@ -45,9 +45,10 @@
   onStep(len){this.glitch.onStep(len,this.target.glitch,S.glitchSlice(this.target.glitchSize));}
   // Four-on-the-floor hit from the sequencer; level 0 = kick off.
   kickHit(){if(this.target.kick>1e-4)this.kick.trigger(this.target.kickDecay);}
-  drumHit(hat,clap){
+  drumHit(hat,clap,snare=0){
    if(hat&&this.target.hat>1e-4)this.drums.hat(hat===2);
    if(clap&&this.target.clap>1e-4)this.drums.clap();
+   if(snare&&this.target.snare>1e-4)this.drums.snare(snare===2?.38:1);
   }
   bassOn(note,tied){if(this.target.bass>1e-4)this.bassVoice.on(note,tied);else this.bassVoice.off();}
   bassOff(){this.bassVoice.off();}
@@ -159,7 +160,7 @@
     // Kick is mixed after the bass chain (no delay/glitch on it); the bass and its echoes duck under it.
     const kk=this.kick.process(t.kickTune)*t.kick*1.15,duck=this.kick.duckGain(t.duck);
     this.drums.process();
-    const hh=this.drums.hatOut*t.hat*.5,cl=this.drums.clapOut*t.clap*.7;
+    const hh=this.drums.hatOut*t.hat*.5,cl=this.drums.clapOut*t.clap*.7+this.drums.snareOut*t.snare*.6;
     // Reverb on bass and clap; the kick and hats stay dry. Silent and exactly bypassed at 0.
     const send=v.reverb*8<1?v.reverb*8:1;
     this.reverb.process((y+cl*.8)*send,t.reverbSize);
