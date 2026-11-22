@@ -143,6 +143,16 @@ test('Orbit distortion is off by default, bounded when on and ignores bad values
  const off=run(null),hot=run(1);assert.deepEqual(run(0),off);assert.deepEqual(run(NaN),off);assert.notDeepEqual(hot,off);
  assert.ok(hot.every(Number.isFinite));assert.ok(Math.max(...hot.map(Math.abs))<1);
 });
+test('a MIDI import feeds a valid Orbit part on the same song grid',()=>{
+ const M=require('../acido/midi.js'),vlq=v=>v>127?[v>>7|128,v&127]:[v],ev=[];
+ for(let b=0;b<3;b++){const t=b*384;for(const [p,ch] of [[72,0],[36,1],[60,2],[64,2],[67,2],[36,9]])ev.push([t,0x90|ch,p,100],[t+48,0x80|ch,p,0]);}
+ ev.sort((a,b)=>a[0]-b[0]);const data=[];let at=0;for(const [when,...x] of ev){data.push(...vlq(when-at),...x);at=when;}data.push(0,255,47,0);
+ const file=Uint8Array.from([77,84,104,100,0,0,0,6,0,0,0,1,0,96,77,84,114,107,0,0,data.length>>8,data.length&255,...data]);
+ const m=M.parseMidi(file),roles=M.suggestRoles(m);assert.deepEqual(m.parts.map((_,i)=>roles[i]),['lead','bass','orbit','drums']);
+ const r=M.arrange(m,{roles,double:false});assert.equal(r.stats.orbit,9);
+ const next=S.validate({patterns:r.patterns,song:r.song,tempo:r.tempo}),part=buildPart(next,{e:r.orbit.e});
+ assert.equal(part.index[1]-part.index[0],3,'the chord starts on the first step');assert.equal(part.index[17]-part.index[16],3,'and again on the next bar');
+});
 test('stop fades voices quickly and leaves silence',()=>{
  const l=new OrbitLayer(SR);l.setScale(defs[0].scale);l.setSound('velvet');l.noteOn(60,.23,1.4);for(let i=0;i<4000;i++)l.process();assert.ok(l.on[0]);
  l.stop();for(let i=0;i<SR/2;i++)l.process();assert.equal(l.on[0],0);for(let i=0;i<SR;i++)l.process();assert.ok(Math.abs(l.l)<1e-4);

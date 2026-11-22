@@ -425,16 +425,26 @@
  // ---- MIDI import ----
  function midiOptions(){
   const bars=M.analyze(midi).bars,start=Math.round(Math.min(bars,Math.max(1,+$('mid-start').value||1)));
-  const count=Math.round(Math.min(bars-start+1,Math.max(1,+$('mid-bars').value||1)));
+  const count=Math.round(Math.min(M.MAX_BLOCKS,bars-start+1,Math.max(1,+$('mid-bars').value||1)));
   $('mid-start').value=start;$('mid-bars').value=count;
-  const split=Math.round(Math.min(108,Math.max(24,+$('mid-split').value||60)));$('mid-split').value=split;
-  return {startBar:start-1,bars:count,track:+$('mid-track').value,split,double:$('mid-double').checked};
+  return {startBar:start-1,bars:count,roles:[...$('mid-parts').querySelectorAll('select')].map(x=>x.value),double:$('mid-double').checked};
+ }
+ function midiParts(info){
+  const roles=M.suggestRoles(midi,{orbit:false});
+  $('mid-parts').replaceChildren(...info.parts.map((p,i)=>{
+   const row=document.createElement('label'),name=document.createElement('span'),select=document.createElement('select');
+   row.className='field';name.textContent=`${p.name||`Ch ${p.channel+1}`} (${p.notes})`;
+   for(const [value,word] of p.drum?[['drums','Batteria'],['off','Escludi']]:[['lead','Melodia'],['bass','Basso'],['off','Escludi']]){const o=new Option(tr(word),value,false,value===roles[i]);o.dataset.word=word;select.add(o);}
+   select.addEventListener('change',midiPreview);row.append(name,select);return row;
+  }));
  }
  function midiPreview(){
-  midiResult=M.convert(midi,midiOptions());
-  const x=midiResult.stats,none=!x.patterns||!(x.lead+x.bass);
+  for(const o of $('mid-parts').querySelectorAll('option'))o.textContent=tr(o.dataset.word);
+  midiResult=M.arrange(midi,midiOptions());
+  const x=midiResult.stats,none=!x.patterns;
   $('mid-go').disabled=none;
-  let text=none?tr('Nessuna nota in queste battute'):tr('{lead} note melodia, {bass} note basso, {patterns} pattern, {seconds} s',x);
+  let text=none?tr('Nessuna nota in queste battute'):tr('{lead} note melodia, {bass} note basso, {drums} colpi, {patterns} pattern, {seconds} s',x);
+  if(!none&&x.exact<x.blocks)text+=` · ${tr('{n} blocchi approssimati',{n:x.blocks-x.exact})}`;
   if(!none&&x.bars<x.requested)text+=` · ${tr('Entrano {bars} battute su {total}',{bars:x.bars,total:x.requested})}`;
   $('mid-preview').textContent=text;
  }
@@ -443,11 +453,11 @@
   try{
    if(file.size>M.MAX_BYTES)throw new Error('BAD_MIDI');
    midi=M.parseMidi(await file.arrayBuffer());
-   const info=M.analyze(midi),track=$('mid-track');
+   const info=M.analyze(midi);
    $('mid-name').textContent=file.name;
    $('mid-info').textContent=tr('{bars} battute, {bpm} BPM',{bars:info.bars,bpm:Math.round(info.bpm)});
-   track.replaceChildren(new Option(tr('Tutte'),'-1'),...info.tracks.map(t=>new Option(`${t.index+1}${t.name?` · ${t.name}`:''} (${t.notes})`,String(t.index))));
-   $('mid-start').max=info.bars;$('mid-bars').max=info.bars;$('mid-start').value=1;$('mid-bars').value=Math.min(info.bars,32);$('mid-split').value=60;$('mid-double').checked=info.suggestDouble;
+   midiParts(info);
+   $('mid-start').max=info.bars;$('mid-bars').max=Math.min(info.bars,M.MAX_BLOCKS);$('mid-start').value=1;$('mid-bars').value=Math.min(info.bars,M.MAX_BLOCKS);$('mid-double').checked=info.suggestDouble;
    midiPreview();
    $('midi-dialog').showModal();
   }catch{midi=null;status('File MIDI non valido');}
@@ -455,7 +465,7 @@
  function importMidi(){
   if(!midiResult||!midiResult.patterns.length)return;
   mark();
-  const r=midiResult,params=r.tuning===null?state.params:{...state.params,tuning:r.tuning};
+  const r=midiResult,params=M.soundParams(state.params,r);
   applyState({...state,params,patterns:r.patterns,tempo:r.tempo,swing:.5,chain:[],song:r.song,current:r.order[0]});
   $('midi-dialog').close();
   status('MIDI importato: {patterns} pattern',{patterns:r.stats.patterns});
@@ -507,7 +517,7 @@
   $('song-add').addEventListener('click',addSection);
   $('import').addEventListener('click',()=>$('midi-file').click());
   $('midi-file').addEventListener('change',e=>{openMidi(e.target.files[0]);e.target.value='';});
-  for(const id of ['mid-track','mid-start','mid-bars','mid-split','mid-double'])$(id).addEventListener('change',midiPreview);
+  for(const id of ['mid-start','mid-bars','mid-double'])$(id).addEventListener('change',midiPreview);
   $('mid-go').addEventListener('click',importMidi);$('mid-cancel').addEventListener('click',()=>$('midi-dialog').close());
   const hasFile=e=>[...(e.dataTransfer?.types||[])].includes('Files');
   document.addEventListener('dragover',e=>{if(hasFile(e))e.preventDefault();});

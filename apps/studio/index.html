@@ -16,6 +16,8 @@
   <button type="button" id="play" class="primary" aria-pressed="false">Play</button>
   <label class="field"><span data-t="Tempo">Tempo</span><input id="tempo" type="number" min="60" max="200" step="1" inputmode="numeric"></label>
   <label class="field"><span data-t="Tonalità">Tonalità</span><input id="key" type="number" min="-12" max="12" step="1" value="0" inputmode="numeric"></label>
+  <button type="button" id="import" data-t="Importa MIDI">Importa MIDI</button>
+  <button type="button" id="presets" data-t="Preset">Preset</button>
   <label class="field"><span data-t="Lingua">Lingua</span><select id="language"><option value="it">Italiano</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option></select></label>
  </header>
 
@@ -57,10 +59,35 @@
  <p class="status" id="status" role="status"></p>
  <footer><span>Luma Studio v0.1.0</span><a href="https://github.com/avalla/luma-audio" target="_blank" rel="noopener">GitHub</a></footer>
 </main>
+<input id="midi-file" type="file" accept=".mid,.midi,audio/midi" hidden>
+<dialog id="midi-dialog" aria-labelledby="midi-title">
+ <h2 id="midi-title" data-t="Importa MIDI">Importa MIDI</h2>
+ <p class="file-name" id="mid-name"></p>
+ <p class="hint" id="mid-info"></p>
+ <h3 data-t="Strumenti">Strumenti</h3>
+ <div class="dialog-grid" id="mid-parts"></div>
+ <div class="dialog-grid">
+  <label class="field"><span data-t="Da battuta">Da battuta</span><input id="mid-start" type="number" min="1" step="1" inputmode="numeric"></label>
+  <label class="field"><span data-t="Battute">Battute</span><input id="mid-bars" type="number" min="1" step="1" inputmode="numeric"></label>
+  <label class="check"><input id="mid-double" type="checkbox"><span data-t="Doppio tempo">Doppio tempo</span></label>
+ </div>
+ <p class="hint" data-t="Sostituisce la sessione attuale. Il file resta nel browser.">Sostituisce la sessione attuale. Il file resta nel browser.</p>
+ <p class="preview" id="mid-preview" role="status"></p>
+ <div class="dialog-actions"><button type="button" id="mid-cancel" data-t="Chiudi">Chiudi</button><button type="button" id="mid-go" class="primary" data-t="Importa">Importa</button></div>
+</dialog>
+<dialog id="presets-dialog" aria-labelledby="presets-title">
+ <h2 id="presets-title" data-t="I miei preset">I miei preset</h2>
+ <div class="preset-save"><input id="preset-name" type="text" maxlength="40" aria-label="Nome preset"><button type="button" id="preset-save" class="primary" data-t="Salva">Salva</button></div>
+ <p class="hint" id="preset-empty" data-t="Nessun preset salvato">Nessun preset salvato</p>
+ <ul id="preset-list"></ul>
+ <p class="hint" data-t="I preset restano in questo browser.">I preset restano in questo browser.</p>
+ <div class="dialog-actions"><button type="button" id="presets-close" data-t="Chiudi">Chiudi</button></div>
+</dialog>
 <script src="session.js"></script>
 <script src="beats.js"></script>
 <script src="demos.js"></script>
 <script src="tools.js"></script>
+<script src="midi.js"></script>
 <script src="flow.js"></script>
 <script src="orbit-layer.js"></script>
 <script src="mixer.js"></script>

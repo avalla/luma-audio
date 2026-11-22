@@ -109,6 +109,18 @@ test('MIDI import: double time, range limits and pattern capacity',()=>{
  const many=[];for(let b=0;b<40;b++)for(let i=0;i<16;i++)if((b>>(i%6))&1)many.push([60+i+b%5,b*384+i*24,24]);
  const r=M.convert(M.parseMidi(smf(many)),{bars:40,double:false});assert.ok(r.patterns.length<=S.PATTERNS);assert.ok(r.order.every(i=>i<r.patterns.length));assert.equal(r.stats.bars,r.order.length);
 });
+test('MIDI song import keeps real drums, roles and the whole song',()=>{
+ const notes=[];for(let bar=0;bar<4;bar++){const t=bar*384;notes.push([72,t,48,0],[36,t,96,1],[36,t,24,9],[38,t+96,24,9],[42,t+48,24,9],[46,t+144,24,9]);}
+ const m=M.parseMidi(smf(notes)),roles=M.suggestRoles(m,{orbit:false});assert.deepEqual(roles,['lead','bass','drums']);
+ const r=M.arrange(m,{roles,double:false}),s=r.patterns[0].steps;
+ assert.equal(r.patterns.length,1);assert.equal(r.stats.bars,4);assert.equal(r.stats.drums,16);
+ assert.equal(r.patterns[0].kicks[0],true);assert.equal(r.patterns[0].kicks[4],false);assert.equal(s[4].snare,1);assert.equal(s[2].hat,1);assert.equal(s[6].hat,2);assert.equal(s[1].hat,0);
+ assert.equal(M.soundParams({kick:0,snare:0,hat:0,clap:0,bass:0,fill:.8},r).fill,0);assert.ok(M.soundParams({kick:0,snare:0,hat:0,clap:0,bass:0,fill:.8},r).kick>0);
+ const many=[];for(let b=0;b<80;b++)for(let i=0;i<16;i++)if((b*7>>(i%7))&1)many.push([60+(b+i)%12,b*384+i*24,24,0]);
+ const long=M.arrange(M.parseMidi(smf(many)),{double:false}),st=S.validate({patterns:long.patterns,song:long.song});
+ assert.equal(long.stats.bars,80,'a long song is not cut at the pattern limit');assert.ok(long.patterns.length<=S.PATTERNS);assert.ok(long.stats.exact<80);
+ assert.equal(st.song.sections.flatMap(x=>x.patterns).length,80);assert.ok(st.song.sections.length<=S.MAX_SECTIONS);
+});
 test('MIDI parser rejects corrupt input without hanging',()=>{
  const good=smf([[60,0,24],[64,96,24]]);
  for(const bad of [new Uint8Array(0),new Uint8Array(20),good.subarray(0,20),Uint8Array.from([...good.subarray(0,14),0x4d,0x54,0x72,0x6b,255,255,255,255])])assert.throws(()=>M.parseMidi(bad),/BAD_MIDI/);

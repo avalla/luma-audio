@@ -128,6 +128,8 @@ dialog p{margin:6px 0}
 .dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
 dialog button.primary{background:var(--acid);border-color:var(--acid);color:#14140f;font-weight:700}
 dialog button:disabled{opacity:.4}
+.mid-heading{margin:10px 0 0;font-size:13px;color:var(--muted)}
+#mid-parts .field span{min-width:0;overflow-wrap:anywhere}
 .preset-save{display:flex;gap:8px;margin-top:12px}
 .preset-save input{flex:1;min-width:0;background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
 #preset-list{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:6px;max-height:45vh;overflow:auto}
