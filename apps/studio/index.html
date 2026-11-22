@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0f0f0d">
+<title>Luma Studio</title>
+<meta name="description" content="Acido and Orbit on one audio clock, with a shared mixer and sidechain.">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="studio.css">
+</head>
+<body>
+<main>
+ <header class="top">
+  <h1 class="brand">LUMA <span>STUDIO</span></h1>
+  <button type="button" id="play" class="primary" aria-pressed="false">Play</button>
+  <label class="field"><span data-t="Tempo">Tempo</span><input id="tempo" type="number" min="60" max="200" step="1" inputmode="numeric"></label>
+  <label class="field"><span data-t="Lingua">Lingua</span><select id="language"><option value="it">Italiano</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option></select></label>
+ </header>
+
+ <section class="timeline" data-label="Arrangiamento">
+  <div class="timeline-head"><h2 data-t="Arrangiamento">Arrangiamento</h2><span id="position" aria-live="off"></span></div>
+  <ol id="sections"></ol>
+ </section>
+
+ <div class="instruments">
+  <section class="panel" data-label="Acido">
+   <h2>Acido</h2>
+   <label class="field wide"><span data-t="Brano">Brano</span><select id="song"></select></label>
+   <div id="acido-controls" class="sliders"></div>
+   <div class="row">
+    <label class="field"><span data-t="Batteria">Batteria</span><select id="beat-style"><option value="techno">Techno</option><option value="rave">Rave</option><option value="breakbeat">Breakbeat</option><option value="jungle">Jungle</option><option value="electro">Electro</option></select></label>
+    <button type="button" id="new-beat" data-t="Nuovo ritmo">Nuovo ritmo</button>
+   </div>
+  </section>
+
+  <section class="panel" data-label="Orbit">
+   <h2>Orbit</h2>
+   <label class="field wide"><span data-t="Timbro">Timbro</span><select id="sound"></select></label>
+   <div id="orbit-controls" class="sliders"></div>
+   <div class="row">
+    <button type="button" id="new-phrase" data-t="Nuova frase">Nuova frase</button>
+    <button type="button" id="keep" aria-pressed="false" data-t="Tieni la frase">Tieni la frase</button>
+   </div>
+   <p class="hint" data-t="Orbit resta nella tonalità del brano e segue gli accordi del basso.">Orbit resta nella tonalità del brano e segue gli accordi del basso.</p>
+  </section>
+ </div>
+
+ <section class="panel" data-label="Mixer">
+  <h2 data-t="Mixer">Mixer</h2>
+  <div id="mixer" class="sliders mixer"></div>
+ </section>
+ <p class="status" id="status" role="status"></p>
+ <footer><span>Luma Studio v0.1.0</span><a href="https://github.com/avalla/luma-audio" target="_blank" rel="noopener">GitHub</a></footer>
+</main>
+<script src="session.js"></script>
+<script src="beats.js"></script>
+<script src="demos.js"></script>
+<script src="flow.js"></script>
+<script src="orbit-layer.js"></script>
+<script src="studio.js"></script>
+</body>
+</html>

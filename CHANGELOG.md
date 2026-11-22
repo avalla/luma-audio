@@ -2,6 +2,8 @@
 
 ## In sviluppo
 
+- Manda ad Acido: Orbit web apre la frase corrente in Acido con note, durate, accenti, sub e batteria.
+
 - Sampler web: carica o trascina un WAV/MP3, dividilo in 8 o 16 fette e suonale come pad; il progetto audio si salva in un JSON locale.
 
 - Broken sul web: Frammentazione introduce pause, gate corti e rimbalzi doppi/ternari sul clock audio; salvata nei preset e nelle scene. MIDI e plugin nativo conservano la frase di base.

@@ -23,7 +23,7 @@
 
  class Engine{
   constructor(sr){
-   this.sr=sr;this.fsOS=sr*2;this.tempo=124;this.sequence=null;
+   this.sr=sr;this.fsOS=sr*2;this.tempo=124;this.sequence=null;this.layer=null;this.leadLevel=1; // layer: optional extra voice used by Luma Studio
    this.target={...S.defaults};this.value={...S.defaults};
    this.smooth=onePole(.012,sr);
    this.slideCoef=onePole(.02,sr); // ~60 ms to land, constant time like the original circuit
@@ -67,7 +67,7 @@
    this.dcX=this.dcY=0;this.dlW=0;this.dlLpL=this.dlLpR=0;
    this.dlL.fill(0);this.dlR.fill(0);
    this.glitch.reset();this.clock=0;this.kick.reset();
-   this.drums.reset();this.formant.reset();this.reverb.reset();this.bassVoice.reset();this.stepVowel=-1;
+   if(this.layer)this.layer.reset();this.drums.reset();this.formant.reset();this.reverb.reset();this.bassVoice.reset();this.stepVowel=-1;
    for(const id in this.auto)this.auto[id]=-1;
    for(const id of SMOOTHED)this.value[id]=this.target[id];
   }
@@ -162,11 +162,13 @@
     this.drums.process();
     const hh=this.drums.hatOut*t.hat*.5,cl=this.drums.clapOut*t.clap*.7+this.drums.snareOut*t.snare*.6;
     // Reverb on bass and clap; the kick and hats stay dry. Silent and exactly bypassed at 0.
+    const layer=this.layer,ll=this.leadLevel;let xl=0,xr=0,xs=0;
+    if(layer){layer.process();xl=layer.l;xr=layer.r;xs=(xl+xr)*.5*layer.send;}
     const send=v.reverb*8<1?v.reverb*8:1;
-    this.reverb.process((y+cl*.8)*send,t.reverbSize);
+    this.reverb.process((y*ll+cl*.8+xs)*send,t.reverbSize);
     const wet=v.reverb*.9,bs=this.bassVoice.process(t.bassTone,t.bassDecay)*t.bass*.8; // dry and centered, ducked with the lead
-    outL[i]=.95*sat(((y+bs+dl*mix+this.reverb.l*wet)*duck+kk+hh+cl)*vol);
-    outR[i]=.95*sat(((y+bs+dr*mix+this.reverb.r*wet)*duck+kk+hh+cl)*vol);
+    outL[i]=.95*sat(((y*ll+bs+dl*ll*mix+this.reverb.l*wet+xl)*duck+kk+hh+cl)*vol);
+    outR[i]=.95*sat(((y*ll+bs+dr*ll*mix+this.reverb.r*wet+xr)*duck+kk+hh+cl)*vol);
    }
   }
  }

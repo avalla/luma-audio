@@ -16,6 +16,10 @@
       "name": "@luma/orbit",
       "version": "0.5.0",
     },
+    "apps/studio": {
+      "name": "@luma/studio",
+      "version": "0.1.0",
+    },
     "packages/orbit-locales": {
       "name": "@luma/orbit-locales",
       "version": "0.5.0",
@@ -157,6 +161,8 @@
     "@luma/orbit": ["@luma/orbit@workspace:apps/orbit"],
 
     "@luma/orbit-locales": ["@luma/orbit-locales@workspace:packages/orbit-locales"],
+
+    "@luma/studio": ["@luma/studio@workspace:apps/studio"],
 
     "@poppinss/colors": ["@poppinss/colors@4.1.6", "", { "dependencies": { "kleur": "^4.1.5" } }, "sha512-H9xkIdFswbS8n1d6vmRd8+c10t2Qe+rZITbbDHHkQixH5+2x1FDGmi/0K+WgWiqQFKPSlIYB7jlH6Kpfn6Fleg=="],
 

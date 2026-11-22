@@ -6,6 +6,7 @@ Bun workspace monorepo.
 
 - `apps/orbit/`: standalone HTML/CSS/JavaScript instrument. `flow.js` generates phrases, `clock.js` schedules audio, `drums.js` synthesizes percussion, and `orbit.js` connects playback and UI.
 - `apps/acido/`: standalone acid bass synth. DSP files are DOM-free and written for a future C++ port.
+- `apps/studio/`: Acido and Orbit in one worklet. It reuses Acido's DSP and Orbit's `flow.js` without copying them.
 - `plugins/luma/`, `plugins/orbit/`, `plugins/rms/`: C++17/JUCE plugins, each with `src/` and `tests/`. All are built by the root `CMakeLists.txt`.
 - `packages/orbit-locales/`: translation catalog that generates Orbit's web and native strings.
 - `docs/` contains guides and installation notes. `scripts/` holds packaging, web staging and the local server. `PRODUCT.md` and `DESIGN.md` describe UI intent.
@@ -19,6 +20,7 @@ Run commands from the repository root. Use Bun, never npm or npx. Native builds 
 bun install
 bun run dev:orbit     # http://127.0.0.1:8765
 bun run dev:acido     # http://127.0.0.1:8767
+bun run dev:studio    # http://127.0.0.1:8769
 bun run test:web
 bun run build:native
 bun run test:native

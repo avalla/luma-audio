@@ -224,5 +224,8 @@ inline constexpr Entry messages[]={
     {"Forma d’onda",{"Forma d’onda","Waveform","Forme d’onde","Wellenform","Forma de onda"}},
     {"WAV / MP3 · massimo 10 MB e 30 secondi · trascina qui",{"WAV / MP3 · massimo 10 MB e 30 secondi · trascina qui","WAV / MP3 · max 10 MB and 30 seconds · drop here","WAV / MP3 · max 10 Mo et 30 secondes · déposer ici","WAV / MP3 · max. 10 MB und 30 Sekunden · hier ablegen","WAV / MP3 · máx. 10 MB y 30 segundos · arrastra aquí"}},
     {"Audio non valido · WAV / MP3, massimo 10 MB e 30 secondi.",{"Audio non valido · WAV / MP3, massimo 10 MB e 30 secondi.","Invalid audio · WAV / MP3, max 10 MB and 30 seconds.","Audio invalide · WAV / MP3, max 10 Mo et 30 secondes.","Ungültiges Audio · WAV / MP3, max. 10 MB und 30 Sekunden.","Audio no válido · WAV / MP3, máx. 10 MB y 30 segundos."}},
+    {"Manda ad Acido",{"Manda ad Acido","Send to Acido","Envoyer vers Acido","An Acido senden","Enviar a Acido"}},
+    {"Frase aperta in Acido.",{"Frase aperta in Acido.","Phrase opened in Acido.","Phrase ouverte dans Acido.","Phrase in Acido geöffnet.","Frase abierta en Acido."}},
+    {"Non riesco ad aprire Acido. Consenti i popup e riprova.",{"Non riesco ad aprire Acido. Consenti i popup e riprova.","Could not open Acido. Allow popups and try again.","Impossible d’ouvrir Acido. Autorisez les fenêtres et réessayez.","Acido lässt sich nicht öffnen. Erlaube Pop-ups und versuche es erneut.","No se puede abrir Acido. Permite las ventanas emergentes e inténtalo de nuevo."}},
 };
 }

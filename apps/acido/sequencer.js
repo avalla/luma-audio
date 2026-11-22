@@ -72,9 +72,10 @@
    this.bassOffAt=Infinity;this.prevBassTie=false;
    if(this.songActive()){this.secI=0;this.secPos=0;this.secRep=0;this.pat=this.song.sections[0].patterns[0];}
    else if(this.chain.length){this.chainPos=0;this.pat=this.chain[0];}
+   if(engine.layer)engine.layer.restart();
    this.fire(engine);
   }
-  stop(engine){if(this.running){engine.noteOff();if(engine.bassOff)engine.bassOff();}this.bassOffAt=Infinity;if(engine.setAuto)for(const id of AUTO)engine.setAuto(id,-1);engine.stepVowel=-1;this.running=false;this.offAt=Infinity;this.lastFired=-1;this.changed=true;}
+  stop(engine){if(engine.layer)engine.layer.stop();if(this.running){engine.noteOff();if(engine.bassOff)engine.bassOff();}this.bassOffAt=Infinity;if(engine.setAuto)for(const id of AUTO)engine.setAuto(id,-1);engine.stepVowel=-1;this.running=false;this.offAt=Infinity;this.lastFired=-1;this.changed=true;}
   tick(engine){
    if(!this.running)return;
    this.pos+=1;
@@ -114,6 +115,7 @@
    const F=fi>=0?Beats.FILLS[fi]:null;
    const kick=F?F.k[pos]===1:p&&Array.isArray(p.kicks)?p.kicks[this.step]===true:this.count%4===0;
    if(kick&&!(m&&m.kick)&&engine.kickHit)engine.kickHit();
+   if(engine.layer)engine.layer.step(this.count,this.curLen,s,!!(m&&m.lead&&m.bass)); // Orbit rests only while both melodic parts do
    this.count++;
    this.applyAuto(engine,this.pat,this.step); // before noteOn, which reads the decay
    if(s&&engine.drumHit){

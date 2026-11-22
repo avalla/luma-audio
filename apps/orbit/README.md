@@ -110,7 +110,7 @@ La configurazione è `wrangler.jsonc`. Dalla radice del repository:
 bun run deploy:orbit
 ```
 
-Lo staging copia solo i quattordici file pubblici in `build/orbit-web`; test, documentazione e plugin nativi non vengono caricati. L'autenticazione resta nella configurazione locale di Wrangler.
+Lo staging copia solo i quindici file pubblici in `build/orbit-web`; test, documentazione e plugin nativi non vengono caricati. L'autenticazione resta nella configurazione locale di Wrangler.
 
 Il prototipo è distinto dai plugin Luma e Luma RMS esistenti: usa Web Audio, non il motore JUCE. La versione web non riceve MIDI né sincronizzazione DAW; il plugin nativo è separato e disponibile in questo repository; i preset JSON conservano le sequenze dopo la chiusura. Il sequencer pianifica note e batteria su AudioContext.currentTime con 100 ms di anticipo; un timer di 25 ms alimenta la coda senza determinare gli istanti di attacco. I cursori seguono il tempo di uscita audio tramite getOutputTimestamp, quando disponibile. Le modifiche ai parametri si applicano ai prossimi eventi non ancora programmati. Blocchi del thread principale oltre la finestra di anticipo possono interrompere il ritmo: il clock riparte senza raffiche di eventi arretrati. Cambiare scheda ferma l'audio.
 
@@ -127,6 +127,10 @@ Orbit offre otto caratteri: Glass, Rubber, Mist, Soft Keys, Bell, Organ, Velvet 
 ## Broken (web)
 
 Frammentazione a 0% conserva il groove. Prova 40–70% con Rubber o Prism: introduce pause, accorcia le note e genera raddoppi o terzine dentro ogni ottavo, rispettando Swing e BPM. Agisce sul synth e sul sub; la batteria mantiene il suo pattern. Si salva nei preset e nelle scene web. MIDI esporta la frase di base, mentre WAV registra i rimbalzi effettivamente suonati. Il plugin nativo non applica ancora Broken: un passaggio nel nativo perde questo controllo. Non modifica permanentemente le pause della frase catturata.
+
+## Manda ad Acido
+
+Il pulsante in Composizione apre Acido con la frase corrente: note, durate, pause, accenti, sub e batteria. Le frasi lunghe diventano una catena di pattern. I dati viaggiano nel frammento `#` del link e non passano da un server. Il link sostituisce la sessione aperta in Acido, che si recupera con Annulla finché la scheda resta aperta.
 
 ## Sampler web
 

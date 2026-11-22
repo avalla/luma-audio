@@ -1,0 +1,11 @@
+{
+  "name": "@luma/studio",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun ../../scripts/serve.ts . 8769 ../acido ../orbit",
+    "test": "bun test --timeout 120000 ./",
+    "build": "python3 ../../scripts/prepare_studio_web.py",
+    "deploy": "bun run test && bun run build && wrangler deploy"
+  }
+}

@@ -1320,6 +1320,24 @@
       "fr": "Audio invalide · WAV / MP3, max 10 Mo et 30 secondes.",
       "de": "Ungültiges Audio · WAV / MP3, max. 10 MB und 30 Sekunden.",
       "es": "Audio no válido · WAV / MP3, máx. 10 MB y 30 segundos."
+    },
+    "Manda ad Acido": {
+      "en": "Send to Acido",
+      "fr": "Envoyer vers Acido",
+      "de": "An Acido senden",
+      "es": "Enviar a Acido"
+    },
+    "Frase aperta in Acido.": {
+      "en": "Phrase opened in Acido.",
+      "fr": "Phrase ouverte dans Acido.",
+      "de": "Phrase in Acido geöffnet.",
+      "es": "Frase abierta en Acido."
+    },
+    "Non riesco ad aprire Acido. Consenti i popup e riprova.": {
+      "en": "Could not open Acido. Allow popups and try again.",
+      "fr": "Impossible d’ouvrir Acido. Autorisez les fenêtres et réessayez.",
+      "de": "Acido lässt sich nicht öffnen. Erlaube Pop-ups und versuche es erneut.",
+      "es": "No se puede abrir Acido. Permite las ventanas emergentes e inténtalo de nuevo."
     }
   }
 }

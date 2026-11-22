@@ -6,6 +6,7 @@ A collection of original music tools: instruments that run in the browser and na
 | --- | --- | --- | --- |
 | **Orbit** | Generative synth and sequencer with electronic drums | Web, VST3, Audio Unit, standalone | [orbit.avalla.dev](https://orbit.avalla.dev) · [macOS download](https://github.com/avalla/luma-audio/releases/latest/download/Luma-Orbit-macOS-Universal.zip) |
 | **Acido** | Acid bassline synth with sequencer, drums, song mode and sung vowels | Web | [acido.avalla.dev](https://acido.avalla.dev) |
+| **Luma Studio** | Acido and Orbit on one audio clock, with a shared mixer and sidechain | Web (local for now) | `bun run dev:studio` |
 | **Luma** | Eight-voice polyphonic synth | VST3, Audio Unit, standalone | [Build from source](#building-the-native-plugins) |
 | **Luma RMS** | RMS and peak meter | VST3, Audio Unit | [Build from source](#building-the-native-plugins) |
 
@@ -14,6 +15,7 @@ A collection of original music tools: instruments that run in the browser and na
 ```text
 apps/orbit/              Orbit for the web
 apps/acido/              Acido for the web
+apps/studio/             Luma Studio, Acido and Orbit in one audio engine
 plugins/luma/            Luma synth (C++17/JUCE)
 plugins/orbit/           Native Orbit plugin
 plugins/rms/             Luma RMS plugin
@@ -28,6 +30,7 @@ The repository uses [Bun](https://bun.sh) workspaces. The web apps are plain HTM
 bun install
 bun run dev:orbit      # http://127.0.0.1:8765
 bun run dev:acido      # http://127.0.0.1:8767
+bun run dev:studio     # http://127.0.0.1:8769
 bun run test:web       # web and translation tests
 bun run build:native   # all native plugins
 bun run test:native    # native tests
@@ -115,6 +118,10 @@ bun run --filter @luma/acido test
 ```
 
 The full reference, in Italian, is in the [Acido guide](apps/acido/README.md).
+
+## Luma Studio
+
+Luma Studio runs Orbit as a voice inside the Acido engine, so the two share one sample clock and cannot drift apart. Orbit stays in the song key, follows the bass chords, rests in sections without lead and bass, and ducks under the kick. See the [Studio guide](apps/studio/README.md).
 
 ## Luma
 

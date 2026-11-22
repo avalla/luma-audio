@@ -13,11 +13,13 @@
     "test:web": "bun run --filter '@luma/*' test",
     "test:native": "ctest --test-dir build --output-on-failure",
     "test:interchange": "bun run apps/orbit/interchange.test.cjs build/orbit-native-preset.json",
-    "build:web": "bun run --filter '@luma/{orbit,acido}' build",
+    "build:web": "bun run --filter '@luma/{orbit,acido,studio}' build",
     "build:native": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release && cmake --build build -j 8",
     "locales": "python3 scripts/generate_orbit_locales.py",
     "deploy:orbit": "bun run --filter @luma/orbit deploy",
-    "deploy:acido": "bun run --filter @luma/acido deploy"
+    "deploy:acido": "bun run --filter @luma/acido deploy",
+    "dev:studio": "bun run --filter @luma/studio dev",
+    "deploy:studio": "bun run --filter @luma/studio deploy"
   },
   "devDependencies": {
     "wrangler": "4.158.0"

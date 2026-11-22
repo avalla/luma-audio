@@ -177,6 +177,13 @@ for(const id of ['swing','probability','energy','fragmentation'])$(id).oninput=(
 document.querySelectorAll('[data-save-scene]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.saveScene);scenes[i]=currentPreset(false);activeScene=i;updateScenes();announce('Scena salvata. Salva il preset per conservarla su file.');});
 document.querySelectorAll('[data-scene]').forEach(b=>b.onclick=()=>{const i=Number(b.dataset.scene);if(!scenes[i])return;if(running){pendingScene=i;updateScenes();}else{applyPreset(scenes[i],false);activeScene=i;updateScenes();}});
 $('fill').onclick=()=>{fillPending=true;announce('Fill pronto per la prossima battuta.');};
+$('send-acido').onclick=async()=>{
+ // The tab opens inside the click, otherwise browsers treat it as a popup.
+ const tab=window.open('about:blank','_blank');
+ if(!tab){announce('Non riesco ad aprire Acido. Consenti i popup e riprova.');return;}
+ try{tab.opener=null;tab.location.href=await OrbitToAcido.link(currentPreset(false),location);announce('Frase aperta in Acido.');}
+ catch{tab.close();announce('Non riesco ad aprire Acido. Consenti i popup e riprova.');}
+};
 $('export-midi').onclick=()=>{download(new Blob([OrbitSession.midiFile(currentPreset())],{type:'audio/midi'}),'Orbit.mid');announce('MIDI esportato: synth, sub e batteria.');};
 $('save-preset').onclick=()=>{download(new Blob([JSON.stringify(currentPreset(),null,2)],{type:'application/json'}),'Orbit-preset.json');announce('Preset condiviso salvato.');};
 $('load-preset').onclick=()=>$('preset-file').click();
