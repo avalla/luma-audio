@@ -1,6 +1,6 @@
 # Luma Audio
 
-A collection of original music tools: instruments that run in the browser and native plugins for macOS.
+A collection of original music tools: instruments that run in the browser and native plugins for macOS and Windows.
 
 | Tool | What it is | Runs on | Try it |
 | --- | --- | --- | --- |
@@ -122,6 +122,14 @@ The full reference, in Italian, is in the [Acido guide](apps/acido/README.md).
 ## Luma Studio
 
 Luma Studio runs Orbit as a voice inside the Acido engine, so the two share one sample clock and cannot drift apart. Orbit stays in the song key, follows the bass chords, rests in sections without lead and bass, and ducks under the kick. See the [Studio guide](apps/studio/README.md).
+
+## Native Acido and Studio
+
+`plugins/acido-core/` is the C++ port of the Acido and Studio engines. It builds **Luma Acido** and **Luma Studio** as VST3, Audio Unit (macOS only) and standalone apps, with host tempo sync, MIDI input, all demo songs, and the Studio mixer. The plugins do not include the web step editor yet.
+
+The **Build Luma Native** workflow builds and tests all plugins on macOS and Windows, compares the native audio with the web engine, and uploads one ZIP per platform. A `luma-v*` tag publishes them as a release. Builds are not notarized or code signed.
+
+After changing the demo songs, run `bun scripts/generate_acido_demos.cjs`.
 
 ## Luma
 

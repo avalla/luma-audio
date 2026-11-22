@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.22)
 project(Luma VERSION 0.2.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>") # Windows users need no Visual C++ redistributable
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
 include(FetchContent)
 if(JUCE_SOURCE_DIR)
   add_subdirectory("${JUCE_SOURCE_DIR}" juce)
@@ -50,3 +52,22 @@ target_sources(LumaOrbitTests PRIVATE plugins/orbit/tests/Orbit.cpp plugins/orbi
 target_compile_definitions(LumaOrbitTests PRIVATE JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
 target_link_libraries(LumaOrbitTests PRIVATE juce::juce_audio_utils)
 add_test(NAME orbit_sequencer COMMAND LumaOrbitTests)
+
+juce_add_binary_data(LumaAcidoData SOURCES plugins/acido-core/demos.json)
+set_target_properties(LumaAcidoData PROPERTIES POSITION_INDEPENDENT_CODE ON)
+function(luma_acido_plugin target name code bundle studio)
+  juce_add_plugin(${target} COMPANY_NAME "Luma Audio" BUNDLE_ID "${bundle}" VERSION 0.1.0
+    PLUGIN_MANUFACTURER_CODE Luma PLUGIN_CODE ${code} FORMATS VST3 AU Standalone
+    PRODUCT_NAME "${name}" IS_SYNTH TRUE NEEDS_MIDI_INPUT TRUE NEEDS_MIDI_OUTPUT FALSE
+    COPY_PLUGIN_AFTER_BUILD FALSE)
+  target_sources(${target} PRIVATE plugins/acido-core/Processor.cpp plugins/acido-core/Editor.cpp)
+  target_compile_definitions(${target} PUBLIC LUMA_STUDIO=${studio} JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0 JUCE_VST3_CAN_REPLACE_VST2=0)
+  target_link_libraries(${target} PRIVATE LumaAcidoData juce::juce_audio_utils PUBLIC juce::juce_recommended_config_flags juce::juce_recommended_warning_flags)
+  juce_add_console_app(${target}Tests PRODUCT_NAME "${name} Tests")
+  target_sources(${target}Tests PRIVATE plugins/acido-core/tests/CoreTests.cpp plugins/acido-core/Processor.cpp plugins/acido-core/Editor.cpp)
+  target_compile_definitions(${target}Tests PRIVATE LUMA_STUDIO=${studio} JucePlugin_Name="${name}" JUCE_WEB_BROWSER=0 JUCE_USE_CURL=0)
+  target_link_libraries(${target}Tests PRIVATE LumaAcidoData juce::juce_audio_utils)
+  add_test(NAME ${target}_core COMMAND ${target}Tests)
+endfunction()
+luma_acido_plugin(LumaAcido "Luma Acido" Acd1 audio.luma.acido 0)
+luma_acido_plugin(LumaStudio "Luma Studio" Std1 audio.luma.studio 1)

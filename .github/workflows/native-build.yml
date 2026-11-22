@@ -1,0 +1,116 @@
+name: Build Luma Native
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ['luma-v*']
+    paths:
+      - 'plugins/**'
+      - 'apps/acido/**'
+      - 'apps/studio/**'
+      - 'apps/orbit/flow.js'
+      - 'packages/orbit-locales/**'
+      - 'CMakeLists.txt'
+      - 'scripts/package_native.py'
+      - 'scripts/check_native_parity.cjs'
+      - 'scripts/generate_acido_demos.cjs'
+      - '.github/workflows/native-build.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: native-build-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 75
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS Universal
+            os: macos-15
+            archive: Luma-Audio-macOS-Universal.zip
+            configure: "'-DCMAKE_OSX_ARCHITECTURES=arm64;x86_64' -DCMAKE_OSX_DEPLOYMENT_TARGET=10.13 -DCMAKE_BUILD_TYPE=Release"
+            package: --universal
+            targets: LumaAcido_VST3 LumaAcido_AU LumaAcido_Standalone LumaStudio_VST3 LumaStudio_AU LumaStudio_Standalone LumaOrbit_VST3 LumaOrbit_AU LumaOrbit_Standalone Luma_VST3 Luma_AU Luma_Standalone LumaRms_VST3 LumaRms_AU LumaAcidoTests LumaStudioTests LumaOrbitTests LumaSmoke LumaRmsTests
+          - name: Windows x64
+            os: windows-2022
+            archive: Luma-Audio-Windows-x64.zip
+            configure: -G "Visual Studio 17 2022" -A x64
+            package: ''
+            targets: LumaAcido_VST3 LumaAcido_Standalone LumaStudio_VST3 LumaStudio_Standalone LumaOrbit_VST3 LumaOrbit_Standalone Luma_VST3 Luma_Standalone LumaRms_VST3 LumaAcidoTests LumaStudioTests LumaOrbitTests LumaSmoke LumaRmsTests
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Check out source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Check out pinned JUCE 8.0.13
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: juce-framework/JUCE
+          ref: 7c9d3783b127263d72bb65fe0a7e2dc8a02a7ac2
+          path: build-deps/JUCE
+          persist-credentials: false
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.4.0
+
+      - name: Check embedded songs
+        run: bun scripts/generate_acido_demos.cjs --check
+
+      - name: Configure
+        run: eval cmake -S . -B build-native -DJUCE_SOURCE_DIR='"$GITHUB_WORKSPACE/build-deps/JUCE"' ${{ matrix.configure }}
+
+      - name: Build plugins, apps and tests
+        run: cmake --build build-native --config Release --parallel 4 --target ${{ matrix.targets }}
+
+      - name: Run native tests
+        run: ctest --test-dir build-native -C Release --output-on-failure -R 'LumaAcido_core|LumaStudio_core|orbit_sequencer|synth_smoke|rms_measurement'
+
+      - name: Compare native audio with the web engine
+        run: |
+          build-native/LumaAcidoTests_artefacts/Release/LumaAcidoTests build-native/parity
+          build-native/LumaStudioTests_artefacts/Release/LumaStudioTests build-native/parity
+          bun scripts/check_native_parity.cjs build-native/parity
+
+      - name: Package and verify
+        run: python3 scripts/package_native.py --build-dir build-native --juce-dir build-deps/JUCE ${{ matrix.package }}
+
+      - name: Upload download
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          path: build/Delivery/${{ matrix.archive }}
+          archive: false
+          if-no-files-found: error
+          retention-days: 30
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/luma-v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - name: Download builds
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          path: delivery
+          merge-multiple: true
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: gh release create "$RELEASE_TAG" delivery/*.zip --verify-tag --title "Luma Audio ${RELEASE_TAG#luma-v}" --generate-notes
