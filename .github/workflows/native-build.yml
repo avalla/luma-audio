@@ -101,13 +101,18 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     permissions:
+      actions: read
       contents: write
     steps:
       - name: Download builds
-        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
-        with:
-          path: delivery
-          merge-multiple: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          mkdir delivery
+          gh api "repos/$GH_REPO/actions/runs/$RUN_ID/artifacts" --jq '.artifacts[] | "\(.id) \(.name)"' |
+            while read -r id name; do gh api "repos/$GH_REPO/actions/artifacts/$id/zip" > "delivery/$name"; done
       - name: Publish release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
