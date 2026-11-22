@@ -15,7 +15,7 @@
    this.sr=sr;this.on=new Uint8Array(VOICES);this.phase=new Float64Array(VOICES);this.inc=new Float64Array(VOICES);this.env=new Float64Array(VOICES);
    this.peak=new Float64Array(VOICES);this.rise=new Float64Array(VOICES);this.fall=new Float64Array(VOICES);this.rising=new Uint8Array(VOICES);this.table=TABLES[0];
    this.deg=new Int8Array(0);this.beats=new Uint8Array(0);this.pitches=new Int16Array(8);this.pcs=new Int8Array(12);this.nPcs=0;
-   this.level=.7;this.send=.25;this.sound=0;this.lp=1;this.lpL=0;this.lpR=0;this.l=0;this.r=0;this.next=0;this.root=-1;
+   this.level=.7;this.send=.25;this.transpose=0;this.octave=0;this.sound=0;this.lp=1;this.lpL=0;this.lpR=0;this.l=0;this.r=0;this.next=0;this.root=-1;
    this.fast=Math.exp(-6.9/(.012*sr));this.setTone(.6);
   }
   setTone(v){const fc=Math.min(this.sr*.45,300+v*v*12000);this.lp=1-Math.exp(-TAU*fc/this.sr);}
@@ -43,13 +43,13 @@
   }
   // Called by the sequencer on every step: one Orbit pulse is two steps.
   step(count,len,s,muted){
-   if(s&&s.bass>=0)this.root=(36+(s.bassOct||0)*12+s.bass)%12;
+   if(s&&s.bass>=0)this.root=((36+(s.bassOct||0)*12+s.bass+this.transpose)%12+12)%12;
    if(count%2)return;
    const n=this.deg.length;if(!n)return;
    const pulse=(count/2)%n,d=this.deg[pulse];
    if(d<0||muted)return;
    const base=this.pitches[d],strong=pulse%4===0;
-   this.noteOn(strong?this.chordTone(base):base,strong?.23:.12,this.beats[pulse]>1?1.4:1);
+   this.noteOn((strong?this.chordTone(base):base)+this.octave*12,strong?.23:.12,this.beats[pulse]>1?1.4:1);
   }
   noteOn(pitch,gain,hold){
    const i=this.next;this.next=(i+1)%VOICES;

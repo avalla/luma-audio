@@ -23,7 +23,7 @@
 
  class Engine{
   constructor(sr){
-   this.sr=sr;this.fsOS=sr*2;this.tempo=124;this.sequence=null;this.layer=null;this.leadLevel=1; // layer: optional extra voice used by Luma Studio
+   this.sr=sr;this.fsOS=sr*2;this.tempo=124;this.sequence=null;this.layer=null;this.mixer=null;this.leadLevel=1; // layer and mixer: optional, used by Luma Studio
    this.target={...S.defaults};this.value={...S.defaults};
    this.smooth=onePole(.012,sr);
    this.slideCoef=onePole(.02,sr); // ~60 ms to land, constant time like the original circuit
@@ -67,7 +67,7 @@
    this.dcX=this.dcY=0;this.dlW=0;this.dlLpL=this.dlLpR=0;
    this.dlL.fill(0);this.dlR.fill(0);
    this.glitch.reset();this.clock=0;this.kick.reset();
-   if(this.layer)this.layer.reset();this.drums.reset();this.formant.reset();this.reverb.reset();this.bassVoice.reset();this.stepVowel=-1;
+   if(this.layer)this.layer.reset();if(this.mixer)this.mixer.reset();this.drums.reset();this.formant.reset();this.reverb.reset();this.bassVoice.reset();this.stepVowel=-1;
    for(const id in this.auto)this.auto[id]=-1;
    for(const id of SMOOTHED)this.value[id]=this.target[id];
   }
@@ -85,7 +85,7 @@
   noteOff(){this.gate=false;}
   panic(){if(this.sequence)this.sequence.running=false;this.reset();}
   process(outL,outR,n){
-   const v=this.value,t=this.target,k=this.smooth,seq=this.sequence,a=this.auto;
+   const v=this.value,t=this.target,k=this.smooth,seq=this.sequence,a=this.auto,m=this.mixer;
    const dlLen=Math.min(this.dlSize-1,Math.max(1,Math.round(this.sr*60/this.tempo*.75)));
    v.decay=a.decay>=0?a.decay:t.decay;
    const dType=Math.round(t.distType*2);
@@ -154,7 +154,7 @@
     let r=this.dlW-dlLen;if(r<0)r+=this.dlSize;
     const dl=this.dlL[r],dr=this.dlR[r];
     this.dlLpL+=(dl-this.dlLpL)*this.dlLp;this.dlLpR+=(dr-this.dlLpR)*this.dlLp;
-    this.dlL[this.dlW]=y+this.dlLpR*.45;this.dlR[this.dlW]=this.dlLpL*.45;
+    this.dlL[this.dlW]=(m?m.delayIn:y)+this.dlLpR*.45;this.dlR[this.dlW]=this.dlLpL*.45;
     if(++this.dlW>=this.dlSize)this.dlW=0;
     const mix=v.delay*.7,vol=v.volume*v.volume*1.3;
     // Kick is mixed after the bass chain (no delay/glitch on it); the bass and its echoes duck under it.
@@ -165,8 +165,14 @@
     const layer=this.layer,ll=this.leadLevel;let xl=0,xr=0,xs=0;
     if(layer){layer.process();xl=layer.l;xr=layer.r;xs=(xl+xr)*.5*layer.send;}
     const send=v.reverb*8<1?v.reverb*8:1;
-    this.reverb.process((y*ll+cl*.8+xs)*send,t.reverbSize);
+    this.reverb.process(m?m.reverbIn:(y*ll+cl*.8+xs)*send,t.reverbSize);
     const wet=v.reverb*.9,bs=this.bassVoice.process(t.bassTone,t.bassDecay)*t.bass*.8; // dry and centered, ducked with the lead
+    if(m){ // Studio: every channel has its own strip, and the delay and reverb are shared send buses
+     m.process(y*ll,xl,xr,bs,kk,this.drums.snareOut*t.snare*.6,hh,this.drums.clapOut*t.clap*.7);
+     outL[i]=.95*sat(((m.duckL+dl*.7*m.retD+this.reverb.l*.9*m.retV)*duck+m.dryL)*vol);
+     outR[i]=.95*sat(((m.duckR+dr*.7*m.retD+this.reverb.r*.9*m.retV)*duck+m.dryR)*vol);
+     continue;
+    }
     outL[i]=.95*sat(((y*ll+bs+dl*ll*mix+this.reverb.l*wet+xl)*duck+kk+hh+cl)*vol);
     outR[i]=.95*sat(((y*ll+bs+dr*ll*mix+this.reverb.r*wet+xr)*duck+kk+hh+cl)*vol);
    }

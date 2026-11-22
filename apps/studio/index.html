@@ -15,12 +15,14 @@
   <h1 class="brand">LUMA <span>STUDIO</span></h1>
   <button type="button" id="play" class="primary" aria-pressed="false">Play</button>
   <label class="field"><span data-t="Tempo">Tempo</span><input id="tempo" type="number" min="60" max="200" step="1" inputmode="numeric"></label>
+  <label class="field"><span data-t="Tonalità">Tonalità</span><input id="key" type="number" min="-12" max="12" step="1" value="0" inputmode="numeric"></label>
   <label class="field"><span data-t="Lingua">Lingua</span><select id="language"><option value="it">Italiano</option><option value="en">English</option><option value="fr">Français</option><option value="de">Deutsch</option><option value="es">Español</option></select></label>
  </header>
 
  <section class="timeline" data-label="Arrangiamento">
-  <div class="timeline-head"><h2 data-t="Arrangiamento">Arrangiamento</h2><span id="position" aria-live="off"></span></div>
+  <div class="timeline-head"><h2 data-t="Arrangiamento">Arrangiamento</h2><span id="position" aria-live="off"></span><button type="button" id="loop" aria-pressed="false" data-t="Ripeti sezione">Ripeti sezione</button></div>
   <ol id="sections"></ol>
+  <p class="hint" data-t="Tastiera: Spazio play · 1-7 muto · Maiusc+1-7 solo · ← → sezione · L ripeti · B ritmo · N frase · G stutter">Tastiera: Spazio play · 1-7 muto · Maiusc+1-7 solo · ← → sezione · L ripeti · B ritmo · N frase · G stutter</p>
  </section>
 
  <div class="instruments">
@@ -31,6 +33,7 @@
    <div class="row">
     <label class="field"><span data-t="Batteria">Batteria</span><select id="beat-style"><option value="techno">Techno</option><option value="rave">Rave</option><option value="breakbeat">Breakbeat</option><option value="jungle">Jungle</option><option value="electro">Electro</option></select></label>
     <button type="button" id="new-beat" data-t="Nuovo ritmo">Nuovo ritmo</button>
+    <button type="button" id="stutter" aria-pressed="false">Stutter</button>
    </div>
   </section>
 
@@ -39,6 +42,7 @@
    <label class="field wide"><span data-t="Timbro">Timbro</span><select id="sound"></select></label>
    <div id="orbit-controls" class="sliders"></div>
    <div class="row">
+    <label class="field"><span data-t="Ottava">Ottava</span><select id="octave"><option value="-1">-1</option><option value="0" selected>0</option><option value="1">+1</option></select></label>
     <button type="button" id="new-phrase" data-t="Nuova frase">Nuova frase</button>
     <button type="button" id="keep" aria-pressed="false" data-t="Tieni la frase">Tieni la frase</button>
    </div>
@@ -47,8 +51,8 @@
  </div>
 
  <section class="panel" data-label="Mixer">
-  <h2 data-t="Mixer">Mixer</h2>
-  <div id="mixer" class="sliders mixer"></div>
+  <div class="mixer-head"><h2 data-t="Mixer">Mixer</h2><button type="button" id="mix-clear" data-t="Togli muti e solo">Togli muti e solo</button></div>
+  <div id="mixer" class="strips"></div>
  </section>
  <p class="status" id="status" role="status"></p>
  <footer><span>Luma Studio v0.1.0</span><a href="https://github.com/avalla/luma-audio" target="_blank" rel="noopener">GitHub</a></footer>
@@ -58,6 +62,7 @@
 <script src="demos.js"></script>
 <script src="flow.js"></script>
 <script src="orbit-layer.js"></script>
+<script src="mixer.js"></script>
 <script src="studio.js"></script>
 </body>
 </html>

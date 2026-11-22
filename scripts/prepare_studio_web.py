@@ -3,7 +3,7 @@ from pathlib import Path
 import shutil
 
 FILES = {
-    "studio": ("index.html", "studio.css", "studio.js", "studio-worklet.js", "orbit-layer.js"),
+    "studio": ("index.html", "studio.css", "studio.js", "studio-worklet.js", "orbit-layer.js", "mixer.js"),
     "acido": ("session.js", "beats.js", "demos.js", "glitch.js", "kick.js", "drums.js", "formant.js", "reverb.js", "bass.js", "engine.js", "sequencer.js"),
     "orbit": ("flow.js",),
 }

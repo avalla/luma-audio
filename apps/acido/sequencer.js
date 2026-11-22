@@ -15,7 +15,7 @@
    this.prevGate=false;this.prevSlide=false;this.lastFired=-1;this.lastPat=0;this.changed=false;this.count=0;
    this.held={}; // knobs being moved: their automation is ignored until release
    this.song=null;this.secI=0;this.secPos=0;this.secRep=0;this.nS=0;this.nI=0;this.nR=0;
-   this.bassOffAt=Infinity;this.prevBassTie=false;
+   this.bassOffAt=Infinity;this.prevBassTie=false;this.qSec=-1;this.loopSec=false; // live section jump and loop, used by Luma Studio
    this.stepLen=this.computeStepLen();
   }
   hold(id,on,engine){this.held[id]=on===true;if(on&&engine.setAuto)engine.setAuto(id,-1);}
@@ -39,8 +39,9 @@
   // Next position in the song, written to fields so the audio thread does not allocate.
   songNext(){
    const list=this.song.sections,sec=list[this.secI];
+   if(this.qSec>=0&&this.qSec<list.length){this.nS=this.qSec;this.nI=0;this.nR=0;return list[this.qSec].patterns[0];}
    let s=this.secI,i=this.secPos+1,r=this.secRep;
-   if(i>=sec.patterns.length){i=0;r++;if(r>=sec.repeat){r=0;s=(s+1)%list.length;}}
+   if(i>=sec.patterns.length){i=0;r++;if(r>=sec.repeat){r=0;if(!this.loopSec)s=(s+1)%list.length;}}
    this.nS=s;this.nI=i;this.nR=r;
    return list[s].patterns[i];
   }
@@ -66,11 +67,13 @@
    if(this.songActive())return; // the song decides what plays; the selection only changes what is edited
    this.queued=i===this.pat?-1:i;
   }
+  // Jumps at the end of the current pattern, or sets where Play starts.
+  queueSection(i){this.qSec=this.songActive()&&Number.isInteger(i)&&i>=0&&i<this.song.sections.length?i:-1;}
   noteOf(s){return BASE_NOTE+s.octave*12+s.note+this.transpose;}
   start(engine){
    this.running=true;this.step=0;this.count=0;this.pos=0;this.prevGate=false;this.prevSlide=false;this.queued=-1;
    this.bassOffAt=Infinity;this.prevBassTie=false;
-   if(this.songActive()){this.secI=0;this.secPos=0;this.secRep=0;this.pat=this.song.sections[0].patterns[0];}
+   if(this.songActive()){this.secI=this.qSec>=0&&this.qSec<this.song.sections.length?this.qSec:0;this.qSec=-1;this.secPos=0;this.secRep=0;this.pat=this.song.sections[this.secI].patterns[0];}
    else if(this.chain.length){this.chainPos=0;this.pat=this.chain[0];}
    if(engine.layer)engine.layer.restart();
    this.fire(engine);
@@ -93,7 +96,7 @@
    this.step++;
    if(this.step<this.len(this.pat))return;
    this.step=0;
-   if(this.songActive()){this.pat=this.songNext();this.secI=this.nS;this.secPos=this.nI;this.secRep=this.nR;this.queued=-1;return;}
+   if(this.songActive()){this.pat=this.songNext();this.secI=this.nS;this.secPos=this.nI;this.secRep=this.nR;this.queued=-1;this.qSec=-1;return;}
    const fromQueue=this.queued>=0;
    this.pat=this.nextPattern();this.queued=-1;
    if(this.chain.length){const ci=this.chain.indexOf(this.pat);this.chainPos=fromQueue?(ci>=0?ci:this.chainPos):(this.chainPos+1)%this.chain.length;}
