@@ -507,7 +507,7 @@
   const sel=$('preset');
   const demos=window.AcidoDemos.demos,allPresets=[...S.presets,...demos];
   S.presets.forEach((p,i)=>{const o=document.createElement('option');o.value=i;I.text(o,p.name);sel.appendChild(o);});
-  for(const [label,kind] of [['Brani demo',undefined],['Brani glitch','glitch']]){
+  for(const [label,kind] of [['Brani demo',undefined],['Brani con voci','voci'],['Brani glitch','glitch']]){
    const group=document.createElement('optgroup');I.attr(group,'label',label);
    demos.forEach((p,i)=>{if(window.AcidoDemos.defs[i].group!==kind)return;const o=document.createElement('option');o.value=S.presets.length+i;o.textContent=p.name;group.appendChild(o);});
    sel.appendChild(group);

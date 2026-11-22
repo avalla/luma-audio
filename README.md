@@ -1,81 +1,75 @@
-# Luma Orbit / Synth + RMS
+# Luma Audio
 
-## Lingua e suono pieno · 0.5
+A collection of original music tools: instruments that run in the browser and native plugins for macOS.
 
-Il selettore Lingua offre italiano, inglese, francese, tedesco e spagnolo. La scelta
-si conserva sul dispositivo e può cambiare durante l'ascolto. È una preferenza
-dell'interfaccia, esclusa dai preset; nomi tecnici dei parametri host e finestre
-di sistema seguono le rispettive convenzioni.
+| Tool | What it is | Runs on | Try it |
+| --- | --- | --- | --- |
+| **Orbit** | Generative synth and sequencer with electronic drums | Web, VST3, Audio Unit, standalone | [orbit.avalla.dev](https://orbit.avalla.dev) · [macOS download](https://github.com/avalla/luma-audio/releases/latest/download/Luma-Orbit-macOS-Universal.zip) |
+| **Acido** | Acid bassline synth with sequencer, drums, song mode and sung vowels | Web | [acido.avalla.dev](https://acido.avalla.dev) |
+| **Luma** | Eight-voice polyphonic synth | VST3, Audio Unit, standalone | [Build from source](#building-the-native-plugins) |
+| **Luma RMS** | RMS and peak meter | VST3, Audio Unit | [Build from source](#building-the-native-plugins) |
 
-**Corpo** aggiunge al synth due sinusoidi scordate di ±7 cent e una componente
-un'ottava sotto, con guadagno normalizzato. Parti dal 35% e prova 35–60% per dare
-più consistenza alle note. Sub e batteria conservano i propri volumi indipendenti.
-Le nuove sessioni partono dal 35%; i vecchi preset vengono caricati con Corpo a
-zero per conservarne il suono: alza il controllo per usare la nuova sonorità.
+## Repository layout
 
-Guide: [Italiano](https://github.com/avalla/luma-orbit/blob/main/docs/Orbit-quickstart.md) ·
-[English](https://github.com/avalla/luma-orbit/blob/main/docs/en/README.md) ·
-[Français](https://github.com/avalla/luma-orbit/blob/main/docs/fr/README.md) ·
-[Deutsch](https://github.com/avalla/luma-orbit/blob/main/docs/de/README.md) ·
-[Español](https://github.com/avalla/luma-orbit/blob/main/docs/es/README.md).
-
-
-**[Apri Orbit](https://orbit.avalla.dev)**: synth e sequencer generativo nel browser,
-con batteria elettronica e pianificazione sul clock audio Web Audio.
-
-**Novità 0.5.0:** quattro scene a tempo, swing, probabilità, macro Energia e Fill.
-Cattura completa delle frasi, preset JSON condivisi tra web e plugin, export MIDI
-(synth/sub/batteria) e registrazione di tre WAV separati e allineati.
-Restano disponibili delay, riverbero, mixer e registrazione del mix fino a cinque minuti.
-
-**Per iniziare:** costruisci un suono, premi **Salva qui** sotto Intro o Groove,
-poi richiama la scena mentre suona. Nel plugin trovi i nuovi comandi in **Effetti e scene**.
-Salva il preset per conservare anche i quattro slot.
-
-Il repository contiene Orbit web e tre plugin nativi macOS: Luma Orbit, Luma e Luma RMS.
-
-## Documentazione
-
-- [Guida rapida](docs/Orbit-quickstart.md): BPM, cattura, scene, preset ed esportazioni.
-- [Changelog](CHANGELOG.md): novità, correzioni e compatibilità per versione.
-- [Guida nativa](docs/Luma-Orbit.md): installazione, Sync DAW e registrazione.
-- [Guida web](prototypes/orbit/README.md): uso nel browser, iPhone e sviluppo locale.
-
-## Luma Orbit nativo
-
-VST3, Audio Unit e standalone, con sequencer Flusso, cinque timbri (Glass, Rubber,
-Mist, Soft Keys e Bell), batteria elettronica e sub-basso intonato. Il trasporto
-può seguire BPM e posizione della DAW; controlli, note e blocchi si salvano nella
-sessione. Il motore audio C++ è indipendente dal browser.
-
-Vedi [installazione, uso e limiti](docs/Luma-Orbit.md). I target CMake sono
-`LumaOrbit_VST3`, `LumaOrbit_AU`, `LumaOrbit_Standalone` e `LumaOrbitTests`.
-Gli artefatti si trovano in `build-universal/LumaOrbit_artefacts/Release/`.
-
-```sh
-python3 scripts/package_orbit.py --build-dir build-universal --juce-dir /percorso/JUCE
+```text
+Source/             C++17/JUCE code for Luma
+Source/Orbit/       Native Orbit plugin
+Source/Rms/         Luma RMS plugin
+Tests/              Native console tests, registered with CTest
+prototypes/orbit/   Orbit for the web
+prototypes/acido/   Acido for the web
+docs/               User guides and installation notes
+locales/            Shared Orbit translations
+scripts/            Packaging and web staging
 ```
 
-Il pacchetto dedicato è `build/Delivery/Luma-Orbit-macOS-Universal.zip`.
+Web instruments are plain HTML, CSS and JavaScript, with no npm install or frontend build.
 
-### Download
+## Orbit
 
-- **[Scarica Luma Orbit per macOS, Intel + Apple Silicon](https://github.com/avalla/luma-orbit/releases/latest/download/Luma-Orbit-macOS-Universal.zip)**: ultima release con VST3, Audio Unit, app standalone, sorgenti e licenze.
-- [Tutte le release](https://github.com/avalla/luma-orbit/releases).
-- [Build di sviluppo in GitHub Actions](https://github.com/avalla/luma-orbit/actions/workflows/orbit-build.yml): apri una build riuscita e scarica lo ZIP in **Artifacts** (login GitHub richiesto, conservazione 30 giorni).
+Orbit is a generative synth and sequencer. Its web version schedules audio on the Web Audio clock. The native version is a separate C++ engine, so the two sound similar but not identical.
 
-La workflow **Build Luma Orbit** parte sulle modifiche native o web in `main`, manualmente
-con **Run workflow**, oppure sui tag `orbit-v*`. I tag pubblicano una release solo
-dopo compilazione, test e verifica del pacchetto. Le build hanno firma ad-hoc;
-non sono notarizzate da Apple. Le release restano scaricabili senza login.
+**New in 0.5:**
 
-## Orbit web
+- A language selector with Italian, English, French, German and Spanish. The choice is stored on the device, can change during playback and is not saved in presets.
+- **Body** adds two sine voices detuned by ±7 cents and one an octave below, with normalized gain. New sessions start at 35%, and 35–60% is a good range. Older presets load with Body at zero to keep their sound.
+- Four timed scenes, swing, probability, and the Energy and Fill macros.
+- Full phrase capture, JSON presets shared between web and plugin, MIDI export (synth, sub, drums) and three aligned WAV stems.
+- Eight timbres: Glass, Rubber, Mist, Soft Keys, Bell, Organ, Velvet and Prism. Presets store the timbre, so reopening one that uses a newer timbre requires an updated Orbit.
 
-Apri [Orbit online](https://orbit.avalla.dev), oppure servilo su localhost per usare anche la registrazione WAV. Non richiede una compilazione o dipendenze
-per l'esecuzione. Per funzionalità, limiti e pubblicazione Cloudflare vedi
-[la guida Orbit](prototypes/orbit/README.md).
+**Getting started:** shape a sound, save it to the Intro or Groove scene, then recall the scene while playing. In the plugin, these controls are under the effects and scenes panel. Save a preset to keep all four scene slots.
 
-Test web di generatore, clock, preset, MIDI e registrazione (Node.js):
+**Guides:** [English](docs/en/README.md) · [Italiano](docs/Orbit-quickstart.md) · [Français](docs/fr/README.md) · [Deutsch](docs/de/README.md) · [Español](docs/es/README.md)
+
+**More:** [changelog](CHANGELOG.md) · [native guide, in Italian](docs/Luma-Orbit.md) · [web guide, in Italian](prototypes/orbit/README.md)
+
+### Native plugin
+
+VST3, Audio Unit and standalone, with the Flow sequencer, electronic drums and a tuned sub bass. Transport can follow the DAW's tempo and position. Controls, notes and locks are saved with the session.
+
+- **[Download Luma Orbit for macOS, Intel + Apple Silicon](https://github.com/avalla/luma-audio/releases/latest/download/Luma-Orbit-macOS-Universal.zip)**: the latest release with VST3, Audio Unit, standalone app, sources and licenses.
+- [All releases](https://github.com/avalla/luma-audio/releases).
+- [Development builds](https://github.com/avalla/luma-audio/actions/workflows/orbit-build.yml): open a successful run and download the ZIP from **Artifacts**. This requires a GitHub login, and builds are kept for 30 days.
+
+The **Build Luma Orbit** workflow runs on native or web changes to `main`, manually with **Run workflow**, or on `orbit-v*` tags. Tags publish a release only after compilation, tests and package verification. Builds are ad-hoc signed and not notarized by Apple.
+
+CMake targets are `LumaOrbit_VST3`, `LumaOrbit_AU`, `LumaOrbit_Standalone` and `LumaOrbitTests`. Artifacts are written to `build-universal/LumaOrbit_artefacts/Release/`. To package them:
+
+```sh
+python3 scripts/package_orbit.py --build-dir build-universal --juce-dir /path/to/JUCE
+```
+
+The package is created at `build/Delivery/Luma-Orbit-macOS-Universal.zip`.
+
+### Web version
+
+Open [Orbit online](https://orbit.avalla.dev), or serve it on localhost to also use WAV recording:
+
+```sh
+python3 -m http.server 8765 --directory prototypes/orbit
+```
+
+Run the generator, clock, preset, MIDI and recording tests with Node.js:
 
 ```sh
 node prototypes/orbit/flow.test.cjs
@@ -83,8 +77,7 @@ node prototypes/orbit/clock.test.cjs
 node prototypes/orbit/session.test.cjs
 ```
 
-Il test di compatibilità richiede prima l'esecuzione del test nativo, che genera
-`build-universal/orbit-native-preset.json`:
+The compatibility test needs the preset generated by the native test. Configure `build-universal` as described in [Building the native plugins](#building-the-native-plugins), then run:
 
 ```sh
 cmake --build build-universal --target LumaOrbitTests -j 8
@@ -92,68 +85,52 @@ ctest --test-dir build-universal -R orbit_sequencer --output-on-failure
 node prototypes/orbit/interchange.test.cjs build-universal/orbit-native-preset.json
 ```
 
-Usa questi comandi dopo aver configurato `build-universal` come descritto in
-[Compilazione](#compilazione). GitHub Actions esegue lo stesso controllo dopo i test nativi.
+## Acido
 
-La UI e il motore web sono separati dai plugin JUCE. Le sonorità sono analoghe,
-ma non identiche: non è una conversione che incorpora Web Audio nel plugin.
+Acido is a monophonic acid bass synth for the browser, with a resonant four-pole filter, accent, slide and a 16-step sequencer. A JUCE version is planned but not started.
 
-## Plugin nativi
+- **Sound:** saw or square oscillator, distortion, glitch and bitcrush, a formant filter that sings A E I O U per step, delay and reverb.
+- **Parts:** lead, second bass voice, programmable kick, hi-hat and clap.
+- **Composition:** 32 patterns, song sections with mutes, per-step automation and MIDI import.
+- **Output:** 24-bit stereo WAV export, private share links and user presets.
+- **Demo songs:** 15 original songs, including vocal and glitch collections.
+- **Languages:** Italian, English, French, German and Spanish.
 
-Due plugin nativi C++ / JUCE 8.0.13 per macOS: sintetizzatore Luma e misuratore Luma RMS.
+Run it locally and test it:
+
+```sh
+python3 -m http.server 8767 --bind 127.0.0.1 --directory prototypes/acido
+node --test prototypes/acido/*.test.cjs
+```
+
+The full reference, in Italian, is in the [Acido guide](prototypes/acido/README.md).
+
+## Luma
+
+An eight-voice synth with two sine, triangle or saw oscillators per voice, mix and detune, a sine sub, a resonant low-pass filter with its own envelope, volume ADSR, stereo chorus and ±2 semitone pitch bend. Presets: Init, Velvet Pad, Rubber Bass, Glass Pluck, Solar Lead and Soft Keys. Manual edits show as "Custom / modified".
+
+- **In a DAW:** create an instrument track and send MIDI to Luma. Parameters are automatable and their state is saved with the project.
+- **On-screen keyboard:** works with the mouse.
+- **Computer keyboard:** plays from middle C (MIDI 60). Use `A S D F G H J K` for white keys and `W E T Y U` for sharps, and hold several keys for chords. In a DAW, the host must forward keys to the plugin.
+- **After typing a value:** click "Suona con la tastiera" or the piano to resume playing. Losing focus releases held keyboard notes.
+- **Knobs:** accept typed values, and a double click restores the default.
 
 ## Luma RMS
 
-Effetto di analisi da inserire sulla traccia o sul master della DAW. Disponibile
-come VST3 e Audio Unit, con ingresso/uscita mono o stereo. Non modifica i campioni
-audio e non introduce latenza. La misura dipende dalla posizione nella catena:
-inseriscilo dopo gli effetti di cui vuoi misurare il risultato.
+An analysis effect for a track or the DAW master, in VST3 and Audio Unit, mono or stereo. It does not change the audio and adds no latency. Place it after the effects whose result you want to measure.
 
-- RMS in tempo reale con finestra mobile di 100, 400 o 1000 ms (default 400 ms).
-- Letture separate L/R e valore principale come media energetica dei canali:
-  `10 * log10((mean(L²) + mean(R²)) / 2)`. In mono usa il solo canale attivo.
-- Picco campione massimo per canale, mantenuto fino a “Reset peak hold”.
-  Il reset viene applicato al prossimo blocco audio.
-- Durante il riempimento iniziale, RMS calcolato sui campioni disponibili.
-  Un cambio di finestra riavvia il riempimento; la finestra si salva nella sessione.
-- Barra da -60 a 0 dBFS, valore numerico anche oltre questi limiti; silenzio = `-inf`.
-- RMS matematico, senza ponderazione o compensazione: una sinusoide con picco
-  a 0 dBFS misura -3.0103 dBFS RMS. Non misura LUFS o true peak.
+- Real-time RMS with a moving window of 100, 400 or 1000 ms (default 400 ms).
+- Separate L/R readings, with a main value equal to the energy average of the channels: `10 * log10((mean(L²) + mean(R²)) / 2)`. In mono it uses the active channel only.
+- Maximum sample peak per channel, held until "Reset peak hold". The reset applies on the next audio block.
+- While the window first fills, RMS uses the available samples. Changing the window restarts the fill, and the window is saved with the session.
+- A meter from -60 to 0 dBFS, with numeric values beyond that range. Silence shows `-inf`.
+- Mathematical RMS with no weighting: a sine peaking at 0 dBFS reads -3.0103 dBFS RMS. It does not measure LUFS or true peak.
 
-L'interfaccia si aggiorna a 30 Hz; il motore aggiorna la misura a ogni callback
-audio. Quando la DAW sospende l'elaborazione restano visibili gli ultimi valori.
-Anche premendo Stop l'ultima lettura e il picco restano visibili; al successivo
-avvio il plugin inizia una nuova misura. La riga di stato distingue audio in
-ingresso, ultima lettura e attesa della riproduzione.
+The display refreshes at 30 Hz, and the engine updates the measurement on every audio callback. After Stop or a DAW suspend, the last reading and peak stay visible, and the next start begins a new measurement. A status line distinguishes incoming audio, last reading and waiting for playback.
 
-Artefatti in `build/LumaRms_artefacts/Release/`:
+## Building the native plugins
 
-- `VST3/Luma RMS.vst3` → `~/Library/Audio/Plug-Ins/VST3/`.
-- `AU/Luma RMS.component` → `~/Library/Audio/Plug-Ins/Components/`.
-
-Riavvia la DAW o esegui una scansione dopo la copia. Il plugin compare come
-**Luma RMS**, effetto di analisi del produttore **Luma Audio**.
-
-## Suonare
-
-8 voci, due oscillatori sine / triangle / saw con miscela e detune, sub sinusoidale,
-filtro passa basso risonante con inviluppo indipendente, ADSR di volume, chorus
-stereo, volume e pitch bend ±2 semitoni. Sei preset: Init, Velvet Pad,
-Rubber Bass, Glass Pluck, Solar Lead e Soft Keys. I preset si scelgono nell'interfaccia;
-le modifiche manuali vengono indicate come “Custom / modified”.
-La tastiera a schermo funziona con il mouse;
-in una DAW crea una traccia strumento e invia MIDI a Luma.
-La tastiera del computer suona da Do centrale (MIDI 60): `A S D F G H J K`
-per i tasti bianchi, `W E T Y U` per i diesis. Tieni premuti più tasti per gli accordi.
-Dopo aver modificato un valore, clicca “Suona con la tastiera” o sul pianoforte
-per riprendere a suonare. La perdita del focus rilascia le note della tastiera.
-In una DAW il programma ospite deve inoltrare i tasti al plugin.
-Le manopole accettano valori digitati; doppio clic ripristina il valore iniziale.
-Parametri automatizzabili e stato salvato con il progetto della DAW.
-
-## Compilazione
-
-Richiede Xcode con Command Line Tools, CMake >=3.22 e accesso a GitHub al primo avvio.
+Requires macOS, Xcode Command Line Tools, CMake 3.22+ and GitHub access on the first run. JUCE 8.0.13 is pinned and fetched automatically. To use a local checkout, add `-DJUCE_SOURCE_DIR=/path/to/JUCE`.
 
 ```sh
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
@@ -161,18 +138,17 @@ cmake --build build -j 8
 ctest --test-dir build --output-on-failure
 ```
 
-Per usare una copia locale di JUCE aggiungi `-DJUCE_SOURCE_DIR=/percorso/JUCE`.
-Gli artefatti sono in `build/Luma_artefacts/Release/`:
+| Plugin | Artifact | Install to |
+| --- | --- | --- |
+| Luma standalone | `build/Luma_artefacts/Release/Standalone/Luma.app` | Run directly |
+| Luma VST3 | `build/Luma_artefacts/Release/VST3/Luma.vst3` | `~/Library/Audio/Plug-Ins/VST3/` |
+| Luma AU | `build/Luma_artefacts/Release/AU/Luma.component` | `~/Library/Audio/Plug-Ins/Components/` |
+| Luma RMS VST3 | `build/LumaRms_artefacts/Release/VST3/Luma RMS.vst3` | `~/Library/Audio/Plug-Ins/VST3/` |
+| Luma RMS AU | `build/LumaRms_artefacts/Release/AU/Luma RMS.component` | `~/Library/Audio/Plug-Ins/Components/` |
 
-- `Standalone/Luma.app`: applicazione per prova diretta.
-- `VST3/Luma.vst3`: copia in `~/Library/Audio/Plug-Ins/VST3/`.
-- `AU/Luma.component`: copia in `~/Library/Audio/Plug-Ins/Components/`.
+The build does not install plugins. After copying them, restart the DAW or rescan. Plugins appear under the manufacturer **Luma Audio**.
 
-La build non installa automaticamente i plugin. Dopo l'installazione riavvia la DAW
-o esegui una nuova scansione. La build locale usa l'architettura del Mac corrente;
-per una build universale configura `-DCMAKE_OSX_ARCHITECTURES="arm64;x86_64"`.
-
-Build e pacchetto universale (Intel + Apple Silicon):
+A local build targets the current Mac's architecture. For a universal build and package (Intel + Apple Silicon):
 
 ```sh
 cmake -S . -B build-universal -DCMAKE_BUILD_TYPE=Release \
@@ -180,43 +156,21 @@ cmake -S . -B build-universal -DCMAKE_BUILD_TYPE=Release \
 cmake --build build-universal -j 8
 ctest --test-dir build-universal --output-on-failure
 python3 scripts/package_plugins.py --build-dir build-universal --universal \
-  --juce-dir /percorso/JUCE
+  --juce-dir /path/to/JUCE
 ```
 
-Lo ZIP viene creato in `build/Delivery/Luma-Plugins-macOS-Universal.zip`.
-I bundle contengono entrambe le architetture. Minimo di compilazione: macOS 10.13
-su Intel e macOS 11 su Apple Silicon; la compatibilità con vecchie versioni del
-sistema va verificata su tali macchine. Lo script verifica architetture, firme
-ad-hoc e integrità dello ZIP e include i sorgenti esatti usati per la build.
+The ZIP is created at `build/Delivery/Luma-Plugins-macOS-Universal.zip`. The build minimum is macOS 10.13 on Intel and macOS 11 on Apple Silicon, and compatibility with older systems still has to be checked on those machines. The script verifies architectures, ad-hoc signatures and ZIP integrity, and includes the exact sources used for the build.
 
-## Struttura e limiti
+## Architecture and limits
 
-`Source/Parameters.h` definisce parametri e preset del synth; `Voice.h` contiene
-le voci, `Plugin.cpp` il processore ed `Editor.cpp` l'interfaccia. Un solo albero di
-parametri alimenta DSP, automazione e controlli. Il motore usa voci preallocate,
-una saw PolyBLEP e una triangle additiva limitata a 8 armoniche dispari.
-Cutoff, risonanza, miscela, sub, detune, profondità dell'inviluppo e volume sono
-smussati. Due chorus mono con modulazioni diverse producono l'apertura stereo;
-la memoria viene allocata in preparazione. Le sessioni v0.1 mantengono i loro
-parametri e ricevono valori neutri per i nuovi controlli.
+- `Source/Parameters.h` defines the synth's parameters and presets, `Voice.h` the voices, `Plugin.cpp` the processor and `Editor.cpp` the interface. A single parameter tree feeds DSP, automation and controls.
+- The Luma engine uses preallocated voices, a PolyBLEP saw and an additive triangle limited to 8 odd harmonics. Cutoff, resonance, mix, sub, detune, envelope depth and volume are smoothed. Two mono choruses with different modulation create the stereo width, and their memory is allocated during preparation. v0.1 sessions keep their parameters and get neutral values for newer controls.
+- `Source/Rms/RmsEngine.h` holds the moving-window calculation, independent of JUCE. The RMS processor reads the buffer without changing it and publishes measurements through atomics.
+- `Tests/Smoke.cpp` checks finite audio, eight voices, three waveforms, sample rates, silence after release and state restore.
+- `Tests/Rms.cpp` checks calibration, the moving window, block-size independence, mono and stereo, bit-identical audio, peak, reset, bypass and state. It also generates `build/Luma-RMS-preview.png`.
 
-`Source/Rms/RmsEngine.h` contiene il calcolo della finestra mobile, indipendente
-da JUCE. Il processore RMS legge il buffer senza modificarlo e pubblica le misure
-tramite atomiche; la conversione in dBFS avviene nell'interfaccia.
-Non ci sono campioni, browser web o asset esterni.
+**Known limits:** CPU use has not been measured in target DAWs. Multi-host validation, Developer ID signing and notarization are missing. Product names and manufacturer identifiers are provisional.
 
-`Tests/Smoke.cpp` verifica suono finito, otto voci, tre forme d'onda e frequenze
-di campionamento, silenzio dopo il rilascio e ripristino dello stato.
-Il consumo CPU deve ancora essere misurato nella DAW di destinazione.
-`Tests/Rms.cpp` verifica calibrazione su sinusoide e segnale costante, finestra
-mobile, indipendenza dai blocchi, mono/stereo, audio identico bit per bit,
-picco, reset, bypass e stato. Genera anche `build/Luma-RMS-preview.png`.
-Mancano validazione multi-host, firma Developer ID e notarizzazione.
-I nomi e gli identificatori del produttore sono provvisori.
+## License
 
-## Licenza
-
-Il codice originale di questo progetto è distribuito con [licenza MIT](LICENSE).
-JUCE e le altre dipendenze mantengono le proprie licenze: la licenza MIT del
-progetto non le sostituisce. JUCE è disponibile con licenza AGPL/commerciale;
-scegliere e rispettare la licenza appropriata prima della distribuzione dei plugin.
+The original code in this project is released under the [MIT License](LICENSE). JUCE and other dependencies keep their own licenses, which the MIT License does not replace. JUCE is available under AGPL or a commercial license, so choose and comply with the appropriate license before distributing the plugins.

@@ -50,18 +50,19 @@
  const range=(a,n)=>Array.from({length:n},(_,i)=>a+i);
  function song({name,tempo,swing=.5,params,roots,style,leadA,leadB,hats='..o.c.o.c.o.c.o.',claps='....x.......x...',kicks=null,vowels=null,short=false}){
   const base={...S.defaults,...params},patterns=Array.from({length:S.PATTERNS},()=>S.emptyPattern());
-  const groove={style,hats,claps,kicks,vowels,short};
+  const voc=j=>Array.isArray(vowels)?vowels[j%vowels.length]:vowels; // one syllable line per bar
+  const groove={style,hats,claps,kicks,short};
   for(let i=0;i<4;i++){
-   patterns[i]=bar({...groove,lead:leadA[i],root:roots[i]});
-   patterns[i+4]=bar({...groove,lead:leadB[i],root:roots[i]});
+   patterns[i]=bar({...groove,vowels:voc(i),lead:leadA[i],root:roots[i]});
+   patterns[i+4]=bar({...groove,vowels:voc(i+4),lead:leadB[i],root:roots[i]});
    // Build: the filter opens over four bars while the clap accelerates.
    const fill=i===3?'xxxxxxxxxxxxxxxx':i===2?'x.x.x.x.x.x.x.x.':claps;
-   const up=bar({...groove,lead:leadA[i],root:roots[i],claps:fill,hats:'..o...o...o...o.',kicks:i===3?'x...x...x.x.xxxx':kicks});
+   const up=bar({...groove,vowels:voc(i),lead:leadA[i],root:roots[i],claps:fill,hats:'..o...o...o...o.',kicks:i===3?'x...x...x.x.xxxx':kicks});
    const low=Math.max(.05,base.cutoff*.55),span=(Math.min(1,base.cutoff+.2)-low)/4;
    up.auto.cutoff=ramp(low+span*i,low+span*(i+1));
    patterns[8+i]=up;
    // Break: no drums, long bass, the melody alone with a darker filter.
-   const down=bar({lead:leadB[i],root:roots[i],style:'sub',vowels,short,kicks:'................'});
+   const down=bar({lead:leadB[i],root:roots[i],style:'sub',vowels:voc(i+4),short,kicks:'................'});
    down.auto.cutoff=ramp(base.cutoff*.8,base.cutoff*.95);
    patterns[16+i]=down;
   }
@@ -111,7 +112,28 @@
   {key:'gs',group:'glitch',scale:[7,9,10,0,2,3,5],name:'Stutter Club',tempo:128,style:'off',short:true,roots:['g1','a#1','d#1','f1'],
    params:{cutoff:.48,resonance:.5,envMod:.5,decay:.2,accent:.6,drive:.3,glitch:.5,glitchSize:.25,delay:.22,reverb:.2,kick:.82,duck:.5,hat:.4,clap:.42,bass:.6,bassTone:.28},
    leadA:['g2! g2 g2 g2 . a#2 . g2 d3! d3 d3 . c3 . a#2 .','a#2! a#2 a#2 a#2 . d3 . a#2 f3! f3 f3 . d#3 . d3 .','d#3! d#3 d#3 d#3 . g3 . d#3 a#3! a#3 a#3 . g3 . f3 .','f2! f2 f2 f2 . a2 . f2 c3! c3 c3 . a#2 . a2 .'],
-   leadB:['d3! . a#2 g2 . d3 f3 d3 g3! . f3 d3 . c3 a#2 .','f3! . d3 a#2 . f3 g3 f3 a#3! . g3 f3 . d3 c3 .','g3! . d#3 a#2 . g3 a#3 g3 c4! . a#3 g3 . f3 d#3 .','c3! . a2 f2 . c3 d#3 c3 f3! . d#3 c3 . a#2 a2 .']}
+   leadB:['d3! . a#2 g2 . d3 f3 d3 g3! . f3 d3 . c3 a#2 .','f3! . d3 a#2 . f3 g3 f3 a#3! . g3 f3 . d3 c3 .','g3! . d#3 a#2 . g3 a#3 g3 c4! . a#3 g3 . f3 d#3 .','c3! . a2 f2 . c3 d#3 c3 f3! . d#3 c3 . a#2 a2 .']},
+  // Vocal songs: the formant filter sings a syllable line over each bar.
+  {key:'fsm',group:'voci',scale:[6,8,9,11,1,2,4],name:'Coro di Mezzanotte',tempo:124,style:'off',roots:['f#1','d2','a1','e2'],hats:'..o...o...o...o.',vowels:['AOO.EEIOO.AAOO..','OAA.IIEAA.OOEE..','EAA.IIOEE.AAUU..','AEE.OOAII.UUOO..','OOAAA.IIEAA.OOU.','AAEII.OOAEE.AAO.','EEAOO.AAIUU.EEA.','OOEAA.IIUOOOO...'],
+   params:{tuning:1,cutoff:.78,resonance:.18,envMod:.15,decay:.7,accent:.15,drive:.12,formant:.92,vowel:0,delay:.3,reverb:.48,reverbSize:.8,kick:.72,duck:.5,hat:.3,clap:.3,bass:.62,bassTone:.22,bassDecay:.5},
+   leadA:['f#3 - - . a3 - g#3 f#3 - . e3 - c#3 - . .','d3 - - . f#3 - e3 d3 - . a3 - f#3 - . .','a3 - - . b3 - a3 e3 - . c#3 - e3 - . .','e3 - - . g#3 - f#3 e3 - . b2 - c#3 - . .'],
+   leadB:['c#3 - e3 f#3 - . a3 - f#3 e3 - . c#3 - b2 .','d3 - f#3 a3 - . b3 - a3 f#3 - . e3 - d3 .','e3 - a3 b3 - . a3 - e3 c#3 - . e3 - f#3 .','g#3 - f#3 e3 - . c#3 - b2 c#3 - - - . . .']},
+  {key:'dv',group:'voci',scale:[2,4,5,7,9,10,0],name:'Sirena Lontana',tempo:118,swing:.54,style:'sub',roots:['d2','a#1','f1','c2'],hats:'..o.....c.o.....',claps:'....x.......x...',vowels:['AAOOO.EEIAA.OOU.','OOAAA.IIEOO.AAU.','EEAAA.OOIEE.AAO.','AAEEE.UUOAA.IIO.'],
+   params:{tuning:1,cutoff:.82,resonance:.12,envMod:.1,decay:.85,accent:.1,drive:.08,formant:.95,vowel:.25,delay:.45,reverb:.62,reverbSize:.9,kick:.66,kickDecay:.55,duck:.55,hat:.24,clap:.24,bass:.66,bassTone:.15,bassDecay:.8},
+   leadA:['d3 - - - - . f3 - e3 d3 - . a2 - - .','a#2 - - - - . d3 - c3 a#2 - . f2 - - .','f3 - - - - . a3 - g3 f3 - . c3 - - .','e3 - - - - . g3 - f3 e3 - . c3 - - .'],
+   leadB:['a3 - - . g3 f3 - . a3 - c4 - a3 - g3 .','f3 - - . d3 a#2 - . d3 - f3 - g3 - f3 .','c4 - - . a3 f3 - . a3 - g3 - f3 - d3 .','e3 - - . c3 e3 - . g3 - a3 - - - . .']},
+  {key:'er',group:'voci',scale:[4,6,7,9,11,0,2],name:'Robot Gentile',tempo:126,swing:.53,style:'gallop',short:true,roots:['e1','c2','g1','d2'],vowels:['IAEOAEUIAOIOUEAO','OEIAUIUAEOAOEIAU','AIOUEOEAIUAUIOEA','EOAIOAUEOIEIOAUE'],
+   params:{waveform:1,cutoff:.68,resonance:.42,envMod:.35,decay:.24,accent:.5,drive:.25,formant:.9,vowel:.5,delay:.2,reverb:.16,kick:.8,hat:.4,clap:.42,bass:.58,bassTone:.3},
+   leadA:['e3 e3 . g3 . e3 d3 . b2 . d3 e3 . g3 a3 .','c3 c3 . e3 . c3 b2 . g2 . b2 c3 . e3 g3 .','g3 g3 . b3 . g3 f#3 . d3 . f#3 g3 . b3 a3 .','d3 d3 . f#3 . d3 c3 . a2 . c3 d3 . f#3 a3 .'],
+   leadB:['b3 . a3 g3 . e3 . g3 a3 . b3 . g3 e3 d3 .','g3 . e3 c3 . e3 . g3 a3 . g3 . e3 c3 b2 .','b3 . g3 d3 . g3 . b3 c4 . b3 . a3 g3 f#3 .','a3 . f#3 d3 . f#3 . a3 b3 . a3 . f#3 d3 e3 .']},
+  {key:'csm',group:'voci',scale:[1,3,4,6,8,9,11],name:'Preghiera Trance',tempo:136,style:'off',roots:['c#2','a1','e2','b1'],vowels:['OOAAIIEEE.OOAAU.','AAOOEEIAA.UUOOA.','EEIIAAOUU.AAEEI.','OOEEAAUOO.IIAAA.'],
+   params:{tuning:1,cutoff:.74,resonance:.22,envMod:.2,decay:.6,accent:.2,drive:.14,formant:.88,vowel:.75,delay:.36,reverb:.5,reverbSize:.85,kick:.78,duck:.6,hat:.36,clap:.34,bass:.6,bassTone:.24},
+   leadA:['c#3 - e3 - g#3 - f#3 e3 - . c#3 - e3 - f#3 .','a2 - c#3 - e3 - f#3 e3 - . c#3 - a2 - b2 .','b2 - e3 - g#3 - a3 g#3 - . e3 - g#3 - b3 .','b2 - d#3 - f#3 - g#3 f#3 - . d#3 - b2 - - .'],
+   leadB:['g#3 - - . b3 a3 - g#3 - . e3 f#3 - g#3 - .','a3 - - . g#3 e3 - c#3 - . e3 f#3 - e3 - .','g#3 - - . b3 g#3 - e3 - . g#3 a3 - b3 - .','f#3 - - . d#3 b2 - d#3 - . f#3 g#3 - - - .']},
+  {key:'c',group:'voci',scale:[0,2,4,5,7,9,11],name:'Ninna Elettrica',tempo:108,swing:.58,style:'sub',roots:['c2','a1','f1','g1'],hats:'..c...c...c...c.',claps:'............x...',kicks:'x.......x.....x.',vowels:['AAAOOOEEUUUIII..','OOOAAAIIEEEUUU..','EEEAAAOOIIIAAA..','UUUOOOAAEEEOOO..'],
+   params:{tuning:1,waveform:.2,cutoff:.72,resonance:.15,envMod:.12,decay:.8,accent:.1,drive:.06,formant:.9,vowel:1,delay:.42,reverb:.55,reverbSize:.75,kick:.6,kickDecay:.6,duck:.4,hat:.22,clap:.22,bass:.6,bassTone:.12,bassDecay:.75},
+   leadA:['e3 - - g3 - - e3 - c3 - - d3 - - . .','c3 - - e3 - - c3 - a2 - - b2 - - . .','a3 - - g3 - - f3 - c3 - - d3 - - . .','b2 - - d3 - - g3 - f3 - - d3 - - . .'],
+   leadB:['g3 - e3 a3 - g3 e3 - . c3 d3 e3 - - . .','e3 - c3 g3 - e3 c3 - . a2 b2 c3 - - . .','a3 - f3 c4 - a3 f3 - . c3 d3 f3 - - . .','g3 - d3 b3 - g3 d3 - . b2 c3 d3 - - . .']}
  ];
  const api={demos:defs.map(song),defs,pitch};
  if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.AcidoDemos=api;

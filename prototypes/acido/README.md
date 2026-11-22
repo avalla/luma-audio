@@ -54,7 +54,7 @@ Tastiera: `A W S E D F T G Y H U J K` = un'ottava, legato = slide, `Shift` = acc
 - **Basso:** seconda voce con Bass, Tone e Decay. Con Modifica su Basso la griglia, Ott e Slide agiscono sul basso; l'altra voce resta visibile in trasparenza.
 - **Brano:** 32 pattern in 4 banchi (A..H, A2..H4) e fino a 16 sezioni, ognuna con pattern, ripetizioni e parti silenziate. L'export WAV segue il brano.
 - **Cassa programmabile:** la riga Kick parte dal 4/4 automatico; il primo clic la rende manuale per quel pattern, `Kick 4/4` la riporta all'automatico.
-- **Brani demo:** dieci brani originali nel menu Preset, con arrangiamento completo. Sei melodici o acid (Notte Italiana, Squelch Notturno, Alba Trance, Rave Gomma, Club Profondo, Acido Parlante) e quattro spezzati nel gruppo Brani glitch (Vetro Rotto, Bit Collasso, Nastro Stanco, Stutter Club).
+- **Brani demo:** quindici brani originali nel menu Preset, con arrangiamento completo. Sei melodici o acid (Notte Italiana, Squelch Notturno, Alba Trance, Rave Gomma, Club Profondo, Acido Parlante), cinque cantati dal filtro a formanti nel gruppo Brani con voci (Coro di Mezzanotte, Sirena Lontana, Robot Gentile, Preghiera Trance, Ninna Elettrica) e quattro spezzati nel gruppo Brani glitch (Vetro Rotto, Bit Collasso, Nastro Stanco, Stutter Club).
 - **I miei preset:** fino a 50 sessioni salvate con un nome in questo browser.
 
 ## Lingue

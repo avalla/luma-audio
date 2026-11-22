@@ -3,7 +3,7 @@ const S=require('./session.js'),{demos,defs,pitch}=require('./demos.js'),{render
 const tokens=b=>b.trim().split(/\s+/).filter(t=>!['.','-'].includes(t));
 
 test('demos are complete songs with lead, bass, drums and sections',()=>{
- assert.equal(demos.length,10);assert.equal(new Set(demos.map(d=>d.name)).size,10);
+ assert.equal(demos.length,15);assert.equal(new Set(demos.map(d=>d.name)).size,15);
  for(const d of demos){
   assert.deepEqual(S.validate(JSON.parse(JSON.stringify(d))),d,d.name);
   assert.ok(d.song.on&&d.song.sections.length>=6,d.name);
@@ -35,6 +35,19 @@ test('glitch songs have a broken groove and the effect really changes the audio'
   let diff=0,e=0;for(let i=0;i<a.length;i++){diff+=(a[i]-b[i])**2;e+=b[i]*b[i];}
   assert.ok(diff/e>.05,`${d.name} glitch effect ${diff/e}`);
   assert.deepEqual(a,renderState(song,{sampleRate:22050,loops:1}).L,`${d.name} is deterministic`);
+ }
+});
+test('vocal songs sing changing vowels on every part of the melody',()=>{
+ const list=defs.map((d,i)=>[d,demos[i]]).filter(([d])=>d.group==='voci');assert.equal(list.length,5);
+ for(const [d,song] of list){
+  assert.ok(song.params.formant>=.85,d.name);
+  const used=[...new Set(song.song.sections.flatMap(x=>x.patterns))],gated=used.flatMap(i=>song.patterns[i].steps).filter(s=>s.gate);
+  assert.ok(gated.filter(s=>s.vowel>=0).length/gated.length>.9,`${d.name} sung steps`);
+  assert.equal(new Set(gated.map(s=>s.vowel).filter(v=>v>=0)).size,5,`${d.name} uses all vowels`);
+  const dry=S.validate({...JSON.parse(JSON.stringify(song)),params:{...song.params,formant:0}});
+  const a=renderState(song,{sampleRate:22050,loops:1}).L,b=renderState(dry,{sampleRate:22050,loops:1}).L;
+  let diff=0,e=0;for(let i=0;i<a.length;i++){diff+=(a[i]-b[i])**2;e+=b[i]*b[i];}
+  assert.ok(diff/e>.05,`${d.name} formant effect ${diff/e}`);
  }
 });
 test('demos fit in a share link',async()=>{

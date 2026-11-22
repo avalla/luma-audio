@@ -126,6 +126,7 @@
   'File MIDI non valido':m('Invalid MIDI file','Fichier MIDI non valide','Ungültige MIDI-Datei','Archivo MIDI no válido'),
   'MIDI importato: {patterns} pattern':m('MIDI imported: {patterns} patterns','MIDI importé : {patterns} patterns','MIDI importiert: {patterns} Pattern','MIDI importado: {patterns} patrones'),
   'Brani demo':m('Demo songs','Morceaux démo','Demo-Songs','Canciones demo'),
+  'Brani con voci':m('Vocal songs','Morceaux vocaux','Songs mit Stimmen','Canciones con voces'),
   'Brani glitch':m('Glitch songs','Morceaux glitch','Glitch-Songs','Canciones glitch'),
   'I miei preset':m('My presets','Mes presets','Meine Presets','Mis presets'),
   'Nome preset':m('Preset name','Nom du preset','Preset-Name','Nombre del preset'),

@@ -31,5 +31,5 @@ test('all interface strings have a translation',()=>{
  for(const g of S.GATE_NAMES)assert.ok(I.messages[`gate ${g}`],g);
  const html=read('index.html').replace(/<script[\s\S]*?<\/script>/g,'').replace(/<svg[\s\S]*?<\/svg>/g,'');
  const keep=new Set(['Kick 4/4','Lead','Rec','Cutoff','Reso','Env Mod','Decay','Play','Tempo','BPM','Swing','%','Preset','Wave','Saw','Square','Overdrive','Fuzz','Dist','Glitch','Stutter','ACIDO','Shift','Esc','play/stop,','Q','Z','X','1','8','/','–','◀','▶','A W S E D F T G Y H U J K','Italiano','English','Français','Deutsch','Español']);
- for(const raw of html.replace(/<head>[\s\S]*?<title>/,'<title>').split(/<[^>]+>/)){const s=raw.trim();if(s&&!keep.has(s))assert.ok(I.messages[s],s);}
+ for(const raw of html.replace(/<head>[\s\S]*?<title>/,'<title>').split(/<[^>]+>/)){const s=raw.trim();if(s&&!keep.has(s)&&s!=='GitHub'&&!/^ACIDO v\d+\.\d+\.\d+ ·$/.test(s))assert.ok(I.messages[s],s);}
 });

@@ -152,6 +152,8 @@ dialog button:disabled{opacity:.4}
 .out{opacity:.28}
 
 .help{font-size:13px;color:var(--muted);line-height:1.6}
+.meta{margin:12px 0 0}
+.meta a{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
 kbd{font:inherit;font-size:12px;background:var(--panel-2);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:1px 5px;color:var(--ink)}
 
 @media (max-width:700px){
